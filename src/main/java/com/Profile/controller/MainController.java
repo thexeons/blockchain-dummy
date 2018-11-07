@@ -132,6 +132,7 @@ public class MainController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println("a");
 		return mBlock;
 	}
 	
