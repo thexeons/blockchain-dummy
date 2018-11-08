@@ -103,14 +103,14 @@ public class MainController {
 			db.openDB();
 			rs = db.executeQuery("select * from msdata order by id desc limit 1");
 			if(!rs.next()) {
-				alBlock.add(new Block("1",mBlock.getFirstname(),mBlock.getLastname(),mBlock.getKtp(),mBlock.getEmail(),mBlock.getDob(),mBlock.getAddress(),mBlock.getNationality(),mBlock.getAccountnum(),mBlock.getPhoto(),"0","0",mBlock.getBcabank(),mBlock.getBcainsurance(),mBlock.getBcasyariah(),mBlock.getBcafinancial(),mBlock.getBcasekuritas()));
+				alBlock.add(new Block("1",mBlock.getFirstname(),mBlock.getLastname(),mBlock.getKtp(),mBlock.getEmail(),mBlock.getDob(),mBlock.getAddress(),mBlock.getNationality(),mBlock.getAccountnum(),mBlock.getPhoto(),mBlock.getVerified(),"0",mBlock.getBcabank(),mBlock.getBcainsurance(),mBlock.getBcasyariah(),mBlock.getBcafinancial(),mBlock.getBcasekuritas()));
 				mBlock.setHash(alBlock.get(alBlock.size()-1).mineBlock(difficulty)[0]);
 				mBlock.setPreviousHash("0");
 				mBlock.setNonce(Integer.parseInt(alBlock.get(alBlock.size()-1).mineBlock(difficulty)[1]));
 				
 				Thread.sleep(100);
 				db.executeUpdate("insert into msdata(id,firstname,lastname,ktp,email,dob,address,nationality,accountnum,photo,verified,timestamp,nonce,bcabank,bcainsurance,bcasyariah,bcafinancial	,bcasekuritas) values "
-						+ "('1','"+mBlock.getFirstname()+"','"+mBlock.getLastname()+"','"+mBlock.getKtp()+"','"+mBlock.getEmail()+"','"+mBlock.getDob()+"','"+mBlock.getAddress()+"','"+mBlock.getNationality()+"','"+mBlock.getAccountnum()+"','"+mBlock.getPhoto()+"','0','"+mBlock.getTimeStamp()+"','"+mBlock.getNonce()+"','"+mBlock.getBcabank()+"','"+mBlock.getBcainsurance()+"','"+mBlock.getBcasyariah()+"','"+mBlock.getBcafinancial()+"','"+mBlock.getBcasekuritas()+"')");                               
+						+ "('1','"+mBlock.getFirstname()+"','"+mBlock.getLastname()+"','"+mBlock.getKtp()+"','"+mBlock.getEmail()+"','"+mBlock.getDob()+"','"+mBlock.getAddress()+"','"+mBlock.getNationality()+"','"+mBlock.getAccountnum()+"','"+mBlock.getPhoto()+"','"+mBlock.getVerified()+"','"+mBlock.getTimeStamp()+"','"+mBlock.getNonce()+"','"+mBlock.getBcabank()+"','"+mBlock.getBcainsurance()+"','"+mBlock.getBcasyariah()+"','"+mBlock.getBcafinancial()+"','"+mBlock.getBcasekuritas()+"')");                               
 				
 				db.executeUpdate("insert into mshash(id,hash,previoushash) values('1','"+mBlock.getHash()+"','"+mBlock.getPreviousHash()+"')");
 			}
@@ -125,12 +125,12 @@ public class MainController {
 					System.out.println("This id Id :"+thisId);
 					
 				}
-				alBlock.add(new Block(thisId,mBlock.getFirstname(),mBlock.getLastname(),mBlock.getKtp(),mBlock.getEmail(),mBlock.getDob(),mBlock.getAddress(),mBlock.getNationality(),mBlock.getAccountnum(),mBlock.getPhoto(),"0",currHash,mBlock.getBcabank(),mBlock.getBcainsurance(),mBlock.getBcasyariah(),mBlock.getBcafinancial(),mBlock.getBcasekuritas()));
+				alBlock.add(new Block(thisId,mBlock.getFirstname(),mBlock.getLastname(),mBlock.getKtp(),mBlock.getEmail(),mBlock.getDob(),mBlock.getAddress(),mBlock.getNationality(),mBlock.getAccountnum(),mBlock.getPhoto(),mBlock.getVerified(),currHash,mBlock.getBcabank(),mBlock.getBcainsurance(),mBlock.getBcasyariah(),mBlock.getBcafinancial(),mBlock.getBcasekuritas()));
 				mBlock.setHash(alBlock.get(alBlock.size()-1).mineBlock(difficulty)[0]);
 				mBlock.setNonce(Integer.parseInt(alBlock.get(alBlock.size()-1).mineBlock(difficulty)[1]));
 				Thread.sleep(100);
 				db.executeUpdate("insert into msdata(id,firstname,lastname,ktp,email,dob,address,nationality,accountnum,photo,verified,timestamp,nonce,bcabank,bcainsurance,bcasyariah,bcafinancial	,bcasekuritas) values "
-						+ "('"+thisId+"','"+mBlock.getFirstname()+"','"+mBlock.getLastname()+"','"+mBlock.getKtp()+"','"+mBlock.getEmail()+"','"+mBlock.getDob()+"','"+mBlock.getAddress()+"','"+mBlock.getNationality()+"','"+mBlock.getAccountnum()+"','"+mBlock.getPhoto()+"','0','"+mBlock.getTimeStamp()+"','"+mBlock.getNonce()+"','"+mBlock.getBcabank()+"','"+mBlock.getBcainsurance()+"','"+mBlock.getBcasyariah()+"','"+mBlock.getBcafinancial()+"','"+mBlock.getBcasekuritas()+"')");
+						+ "('"+thisId+"','"+mBlock.getFirstname()+"','"+mBlock.getLastname()+"','"+mBlock.getKtp()+"','"+mBlock.getEmail()+"','"+mBlock.getDob()+"','"+mBlock.getAddress()+"','"+mBlock.getNationality()+"','"+mBlock.getAccountnum()+"','"+mBlock.getPhoto()+"','"+mBlock.getVerified()+"','"+mBlock.getTimeStamp()+"','"+mBlock.getNonce()+"','"+mBlock.getBcabank()+"','"+mBlock.getBcainsurance()+"','"+mBlock.getBcasyariah()+"','"+mBlock.getBcafinancial()+"','"+mBlock.getBcasekuritas()+"')");
 				
 				db.executeUpdate("insert into mshash(id,hash,previoushash) values('"+thisId+"','"+mBlock.getHash()+"','"+currHash+"')");
 				
@@ -140,23 +140,23 @@ public class MainController {
 			e.printStackTrace();
 		}
 		
-		if(mBlock.getBcabank()=="1") {
+		if(mBlock.getBcabank().equals("1")) {
 			RestTemplate restTemplate = new RestTemplate();
-	         String url = "http://192.168.43.219:8090/newBlock";
+	         String url = "http://192.168.43.221:8090/bankBlock";
 	         HttpHeaders headers = new HttpHeaders();
 	         headers.setContentType(MediaType.APPLICATION_JSON);
 	         JSONObject postdata = new JSONObject();
-	         Block blok = new Block(mBlock.getFirstname(),mBlock.getLastname(),mBlock.getDob(), mBlock.getAddress(), mBlock.getEmail(), mBlock.getKtp(), mBlock.getNationality(), mBlock.getPhoto(), mBlock.getAccountnum());
+	         //Block blok = new Block(mBlock.getFirstname(),mBlock.getLastname(),mBlock.getDob(), mBlock.getAddress(), mBlock.getEmail(), mBlock.getKtp(), mBlock.getNationality(), mBlock.getPhoto(), mBlock.getAccountnum());
 	         try {
-	             postdata.put("firstname",blok.getFirstname());
-	             postdata.put("lastname",blok.getLastname());
-	             postdata.put("ktp",blok.getKtp());
-	             postdata.put("email",blok.getEmail());
-	             postdata.put("dob",blok.getDob());
-	             postdata.put("address",blok.getAddress());
-	             postdata.put("nationality",blok.getNationality());
-	             postdata.put("accountnum",blok.getAccountnum());
-	             postdata.put("photo",blok.getPhoto());
+	             postdata.put("firstname",mBlock.getFirstname());
+	             postdata.put("lastname",mBlock.getLastname());
+	             postdata.put("ktp",mBlock.getKtp());
+	             postdata.put("email",mBlock.getEmail());
+	             postdata.put("dob",mBlock.getDob());
+	             postdata.put("address",mBlock.getAddress());
+	             postdata.put("nationality",mBlock.getNationality());
+	             postdata.put("accountnum",mBlock.getAccountnum());
+	             postdata.put("photo",mBlock.getPhoto());
 	         }
 	         catch (JSONException e)
 	         {
@@ -170,13 +170,6 @@ public class MainController {
 		return mBlock;
 	}
 	
-	@PostMapping()
-	public Block mainBlock(@RequestBody Block nBlock) {
-		
-		
-		
-		return nBlock;
-	}
 	
 	@DeleteMapping("/persons/{id}")
 	public void deletePerson(@PathVariable Long id) {
