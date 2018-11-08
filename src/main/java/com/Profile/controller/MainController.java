@@ -6,8 +6,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import com.Profile.model.Block;
 import com.Profile.model.Person;
@@ -31,6 +37,7 @@ public class MainController {
 	
 	ResultSet rs;
 	ConnectDB db = new ConnectDB();
+	RestTemplate rt = new RestTemplate();
 
 	ArrayList<Block> alBlock = new ArrayList<Block>();
 	public static int difficulty = 2;
@@ -96,14 +103,14 @@ public class MainController {
 			db.openDB();
 			rs = db.executeQuery("select * from msdata order by id desc limit 1");
 			if(!rs.next()) {
-				alBlock.add(new Block("1",mBlock.getFirstname(),mBlock.getLastname(),mBlock.getKtp(),mBlock.getEmail(),mBlock.getDob(),mBlock.getAddress(),mBlock.getNationality(),mBlock.getAccountnum(),mBlock.getPhoto(),"0","0"));
+				alBlock.add(new Block("1",mBlock.getFirstname(),mBlock.getLastname(),mBlock.getKtp(),mBlock.getEmail(),mBlock.getDob(),mBlock.getAddress(),mBlock.getNationality(),mBlock.getAccountnum(),mBlock.getPhoto(),"0","0",mBlock.getBcabank(),mBlock.getBcainsurance(),mBlock.getBcasyariah(),mBlock.getBcafinancial(),mBlock.getBcasekuritas()));
 				mBlock.setHash(alBlock.get(alBlock.size()-1).mineBlock(difficulty)[0]);
 				mBlock.setPreviousHash("0");
 				mBlock.setNonce(Integer.parseInt(alBlock.get(alBlock.size()-1).mineBlock(difficulty)[1]));
 				
 				Thread.sleep(100);
-				db.executeUpdate("insert into msdata(id,firstname,lastname,ktp,email,dob,address,nationality,accountnum,photo,verified,timestamp,nonce) values "
-						+ "('1','"+mBlock.getFirstname()+"','"+mBlock.getLastname()+"','"+mBlock.getKtp()+"','"+mBlock.getEmail()+"','"+mBlock.getDob()+"','"+mBlock.getAddress()+"','"+mBlock.getNationality()+"','"+mBlock.getAccountnum()+"','"+mBlock.getPhoto()+"','0','"+mBlock.getTimeStamp()+"','"+mBlock.getNonce()+"')");                               
+				db.executeUpdate("insert into msdata(id,firstname,lastname,ktp,email,dob,address,nationality,accountnum,photo,verified,timestamp,nonce,bcabank,bcainsurance,bcasyariah,bcafinancial	,bcasekuritas) values "
+						+ "('1','"+mBlock.getFirstname()+"','"+mBlock.getLastname()+"','"+mBlock.getKtp()+"','"+mBlock.getEmail()+"','"+mBlock.getDob()+"','"+mBlock.getAddress()+"','"+mBlock.getNationality()+"','"+mBlock.getAccountnum()+"','"+mBlock.getPhoto()+"','0','"+mBlock.getTimeStamp()+"','"+mBlock.getNonce()+"','"+mBlock.getBcabank()+"','"+mBlock.getBcainsurance()+"','"+mBlock.getBcasyariah()+"','"+mBlock.getBcafinancial()+"','"+mBlock.getBcasekuritas()+"')");                               
 				
 				db.executeUpdate("insert into mshash(id,hash,previoushash) values('1','"+mBlock.getHash()+"','"+mBlock.getPreviousHash()+"')");
 			}
@@ -118,12 +125,12 @@ public class MainController {
 					System.out.println("This id Id :"+thisId);
 					
 				}
-				alBlock.add(new Block(thisId,mBlock.getFirstname(),mBlock.getLastname(),mBlock.getKtp(),mBlock.getEmail(),mBlock.getDob(),mBlock.getAddress(),mBlock.getNationality(),mBlock.getAccountnum(),mBlock.getPhoto(),"0",currHash));
+				alBlock.add(new Block(thisId,mBlock.getFirstname(),mBlock.getLastname(),mBlock.getKtp(),mBlock.getEmail(),mBlock.getDob(),mBlock.getAddress(),mBlock.getNationality(),mBlock.getAccountnum(),mBlock.getPhoto(),"0",currHash,mBlock.getBcabank(),mBlock.getBcainsurance(),mBlock.getBcasyariah(),mBlock.getBcafinancial(),mBlock.getBcasekuritas()));
 				mBlock.setHash(alBlock.get(alBlock.size()-1).mineBlock(difficulty)[0]);
 				mBlock.setNonce(Integer.parseInt(alBlock.get(alBlock.size()-1).mineBlock(difficulty)[1]));
 				Thread.sleep(100);
-				db.executeUpdate("insert into msdata(id,firstname,lastname,ktp,email,dob,address,nationality,accountnum,photo,verified,timestamp,nonce) values "
-						+ "('"+thisId+"','"+mBlock.getFirstname()+"','"+mBlock.getLastname()+"','"+mBlock.getKtp()+"','"+mBlock.getEmail()+"','"+mBlock.getDob()+"','"+mBlock.getAddress()+"','"+mBlock.getNationality()+"','"+mBlock.getAccountnum()+"','"+mBlock.getPhoto()+"','0','"+mBlock.getTimeStamp()+"','"+mBlock.getNonce()+"')");
+				db.executeUpdate("insert into msdata(id,firstname,lastname,ktp,email,dob,address,nationality,accountnum,photo,verified,timestamp,nonce,bcabank,bcainsurance,bcasyariah,bcafinancial	,bcasekuritas) values "
+						+ "('"+thisId+"','"+mBlock.getFirstname()+"','"+mBlock.getLastname()+"','"+mBlock.getKtp()+"','"+mBlock.getEmail()+"','"+mBlock.getDob()+"','"+mBlock.getAddress()+"','"+mBlock.getNationality()+"','"+mBlock.getAccountnum()+"','"+mBlock.getPhoto()+"','0','"+mBlock.getTimeStamp()+"','"+mBlock.getNonce()+"','"+mBlock.getBcabank()+"','"+mBlock.getBcainsurance()+"','"+mBlock.getBcasyariah()+"','"+mBlock.getBcafinancial()+"','"+mBlock.getBcasekuritas()+"')");
 				
 				db.executeUpdate("insert into mshash(id,hash,previoushash) values('"+thisId+"','"+mBlock.getHash()+"','"+currHash+"')");
 				
@@ -132,8 +139,43 @@ public class MainController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("a");
+		
+		if(mBlock.getBcabank()=="1") {
+			RestTemplate restTemplate = new RestTemplate();
+	         String url = "http://192.168.43.219:8090/newBlock";
+	         HttpHeaders headers = new HttpHeaders();
+	         headers.setContentType(MediaType.APPLICATION_JSON);
+	         JSONObject postdata = new JSONObject();
+	         Block blok = new Block(mBlock.getFirstname(),mBlock.getLastname(),mBlock.getDob(), mBlock.getAddress(), mBlock.getEmail(), mBlock.getKtp(), mBlock.getNationality(), mBlock.getPhoto(), mBlock.getAccountnum());
+	         try {
+	             postdata.put("firstname",blok.getFirstname());
+	             postdata.put("lastname",blok.getLastname());
+	             postdata.put("ktp",blok.getKtp());
+	             postdata.put("email",blok.getEmail());
+	             postdata.put("dob",blok.getDob());
+	             postdata.put("address",blok.getAddress());
+	             postdata.put("nationality",blok.getNationality());
+	             postdata.put("accountnum",blok.getAccountnum());
+	             postdata.put("photo",blok.getPhoto());
+	         }
+	         catch (JSONException e)
+	         {
+	             e.printStackTrace();
+	         }
+	         String requestJson = postdata.toString();
+	         HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
+	         String answer = restTemplate.postForObject(url, entity, String.class);
+	         System.out.println(answer);
+		}
 		return mBlock;
+	}
+	
+	@PostMapping()
+	public Block mainBlock(@RequestBody Block nBlock) {
+		
+		
+		
+		return nBlock;
 	}
 	
 	@DeleteMapping("/persons/{id}")
@@ -185,7 +227,7 @@ public class MainController {
 			db.openDB();
 			rs=db.executeQuery("select * from msdata join mshash on msdata.id = mshash.id");
 			while(rs.next()) {
-				alBlock.add(new Block(rs.getString(1),rs.getString(2), rs.getString(3),rs.getString(4),rs.getString(5), rs.getString(6),rs.getString(7), rs.getString(8),rs.getString(9),rs.getString(10),rs.getString(11), rs.getString(16),rs.getString(15),Integer.parseInt(rs.getString(13))));
+				alBlock.add(new Block(rs.getString(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6),rs.getString(7),rs.getString(8),rs.getString(9),rs.getString(10),rs.getString(11),rs.getString(21),rs.getString(20), Integer.parseInt(rs.getString(13)),rs.getString(14),rs.getString(15),rs.getString(16), rs.getString(17),rs.getString(18)));
 			}
 			db.closeDB();
 		} catch (Exception e) {

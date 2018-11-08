@@ -21,10 +21,16 @@ public class Block {
 	private long timeStamp;
 	private int nonce;
 	
+	private String bcabank;
+	private String bcainsurance;
+	private String bcasyariah;
+	private String bcafinancial;
+	private String bcasekuritas;
+	
 	//Constructor.
 
 	@JsonCreator
-	public Block(String id,String firstname, String lastname, String ktp, String email, String dob, String address, String nationality, String accountnum,String photo,String verified, String previousHash){
+	public Block(String id,String firstname, String lastname, String ktp, String email, String dob, String address, String nationality, String accountnum,String photo,String verified, String previousHash,String bcabank,String bcainsurance,String bcasyariah,String bcafinancial,String bcasekuritas){
 		
 		this.id = id;
 		this.firstname = firstname;
@@ -40,9 +46,14 @@ public class Block {
 		this.previousHash = previousHash;
 		this.timeStamp = new Date().getTime();
 		this.hash = calculateHash();
+		this.bcabank = bcabank;
+		this.bcainsurance = bcainsurance;
+		this.bcasyariah = bcasyariah;
+		this.bcafinancial = bcafinancial;
+		this.bcasekuritas = bcasekuritas;
 	}
 	
-	public Block(String id,String firstname, String lastname, String ktp, String email, String dob, String address, String nationality, String accountnum,String photo,String verified, String previousHash,String hash,int nonce){
+	public Block(String id,String firstname, String lastname, String ktp, String email, String dob, String address, String nationality, String accountnum,String photo,String verified, String previousHash,String hash,int nonce,String bcabank,String bcainsurance,String bcasyariah,String bcafinancial,String bcasekuritas){
 		this.id = id;
 		this.firstname = firstname;
 		this.lastname = lastname;
@@ -58,7 +69,25 @@ public class Block {
 		this.timeStamp= new Date().getTime();
 		this.hash = hash;
 		this.nonce=nonce;
+		this.bcabank = bcabank;
+		this.bcainsurance = bcainsurance;
+		this.bcasyariah = bcasyariah;
+		this.bcafinancial = bcafinancial;
+		this.bcasekuritas = bcasekuritas;
 	}
+	
+	public Block(String firstname, String lastname, String dob, String address, String email, String ktp,String nationality, String photo, String accountnum) {
+		this.firstname = firstname;
+		this.lastname = lastname;
+		this.dob = dob;
+		this.address = address;
+		this.email= email;
+		this.accountnum = accountnum;
+		this.ktp = ktp;
+		this.photo = photo;
+		this.nationality = nationality;
+	}
+	
 	
 	public Block(String firstname) {
 		this.firstname = firstname;
@@ -84,8 +113,46 @@ public class Block {
 		return arrayx;
 	}
 
-	
-	
+	public String getBcabank() {
+		return bcabank;
+	}
+
+	public void setBcabank(String bcabank) {
+		this.bcabank = bcabank;
+	}
+
+	public String getBcainsurance() {
+		return bcainsurance;
+	}
+
+	public void setBcainsurance(String bcainsurance) {
+		this.bcainsurance = bcainsurance;
+	}
+
+	public String getBcasyariah() {
+		return bcasyariah;
+	}
+
+	public void setBcasyariah(String bcasyariah) {
+		this.bcasyariah = bcasyariah;
+	}
+
+	public String getBcafinancial() {
+		return bcafinancial;
+	}
+
+	public void setBcafinancial(String bcafinancial) {
+		this.bcafinancial = bcafinancial;
+	}
+
+	public String getBcasekuritas() {
+		return bcasekuritas;
+	}
+
+	public void setBcasekuritas(String bcasekuritas) {
+		this.bcasekuritas = bcasekuritas;
+	}
+
 	public String getHash() {
 		return hash;
 	}
