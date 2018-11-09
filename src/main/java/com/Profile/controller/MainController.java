@@ -142,7 +142,7 @@ public class MainController {
 		
 		if(mBlock.getBcabank().equals("1")) {
 			RestTemplate restTemplate = new RestTemplate();
-	         String url = "http://192.168.43.221:8090/bankBlock";
+	         String url = "http://192.168.43.171:8090/bankBlock";
 	         HttpHeaders headers = new HttpHeaders();
 	         headers.setContentType(MediaType.APPLICATION_JSON);
 	         JSONObject postdata = new JSONObject();
