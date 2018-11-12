@@ -27,6 +27,10 @@ public class Block {
 	private String bcafinancial;
 	private String bcasekuritas;
 	
+	private String signature;
+	private String data;
+	
+	
 	//Constructor.
 
 	@JsonCreator
@@ -91,6 +95,11 @@ public class Block {
 	
 	public Block(String firstname) {
 		this.firstname = firstname;
+	}
+	
+	public Block(String signature, String data) {
+		this.signature= signature;
+		this.data = data;
 	}
 	
 	public String calculateHash(){
@@ -271,6 +280,22 @@ public class Block {
 
 	public void setVerified(String verified) {
 		this.verified = verified;
+	}
+
+	public String getSignature() {
+		return signature;
+	}
+
+	public void setSignature(String signature) {
+		this.signature = signature;
+	}
+
+	public String getData() {
+		return data;
+	}
+
+	public void setData(String data) {
+		this.data = data;
 	}
 
 	@Override
