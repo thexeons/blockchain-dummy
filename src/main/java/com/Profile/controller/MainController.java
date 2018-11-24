@@ -95,7 +95,119 @@ public class MainController {
 //		mBlock.getFirstname();
 //		return mBlock;
 //	}
+	
+	@PostMapping("/getUserDetail")
+	public String getUserStatus(@RequestBody Block uBlock) {
+		
+		String bankStatus ="";
+		String insuranceStatus ="";
+		String financialStatus ="";
+		String syariahStatus ="";
+		String sekuritasStatus ="";
+		try {
+			db.openDB();
+			
+			db.executeQuery("select bcabank,bcainsurance,bcasyariah,bcafinancial,bcasekuritas from mstemp"); 
+			while(rs.next()) {
+				if(rs.getString(1)=="0") {bankStatus="not Registered";}else {bankStatus="Pending";}
+				if(rs.getString(2)=="0") {insuranceStatus="not Registered";}else {insuranceStatus="Pending";}
+				if(rs.getString(3)=="0") {syariahStatus="not Registered";}else {syariahStatus="Pending";}
+				if(rs.getString(4)=="0") {financialStatus="not Registered";}else {financialStatus="Pending";}
+				if(rs.getString(5)=="0") {sekuritasStatus="not Registered";}else {sekuritasStatus="Pending";}
+			}
+			
+			db.executeQuery("select bcabank,bcainsurance,bcasyariah,bcafinancial,bcasekuritas from msdata order by id desc limit 1");
+			while(rs.next()) {
+				if(rs.getString(1)=="0") {bankStatus="not Registered";}
+				else if(rs.getString(1)=="1"){bankStatus="Accepted";}
+				else if(rs.getString(1)=="2"){bankStatus="Blacklist";}
+				
+				if(rs.getString(2)=="0") {insuranceStatus="not Registered";}
+				else if(rs.getString(2)=="1") {insuranceStatus="Accepted";}
+				else if(rs.getString(2)=="2"){insuranceStatus="Blacklist";}
+				
+				if(rs.getString(3)=="0") {syariahStatus="not Registered";}
+				else if(rs.getString(3)=="1") {syariahStatus="Accepted";}
+				else if(rs.getString(3)=="2"){syariahStatus="Blacklist";}
+				
+				if(rs.getString(4)=="0") {financialStatus="not Registered";}
+				else if(rs.getString(4)=="1") {financialStatus="Accepted";}
+				else if(rs.getString(4)=="2"){financialStatus="Blacklist";}
+				
+				if(rs.getString(5)=="0") {sekuritasStatus="not Registered";}
+				else if(rs.getString(5)=="1") {sekuritasStatus="Accepted";}
+				else if(rs.getString(5)=="2"){sekuritasStatus="Blacklist";}
+				
+			}
+			
+			db.closeDB();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
+        JSONObject postdata = new JSONObject();
+        try {
+            postdata.put("bcabank",bankStatus);
+            postdata.put("bcasyariah",syariahStatus);
+            postdata.put("bcasekuritas",sekuritasStatus);
+            postdata.put("bcainsurance",insuranceStatus);
+            postdata.put("bcafinancial",financialStatus);
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+        }
+        
+        String requestJson = postdata.toString();
+		return requestJson;
+	}
+	
+	@PostMapping("/tempBlock")
+	public Block tempBlock(@RequestBody Block xBlock) {
+		try {
+			db.openDB();
+			Thread.sleep(100);
+			db.executeUpdate("insert into mstemp(firstname,lastname,ktp,email,dob,address,nationality,accountnum,photo,verified,bcabank,bcainsurance,bcasyariah,bcafinancial	,bcasekuritas) values "
+					+ "('"+xBlock.getFirstname()+"','"+xBlock.getLastname()+"','"+xBlock.getKtp()+"','"+xBlock.getEmail()+"','"+xBlock.getDob()+"','"+xBlock.getAddress()+"','"+xBlock.getNationality()+"','"+xBlock.getAccountnum()+"','"+xBlock.getPhoto()+"','"+xBlock.getVerified()+"','"+xBlock.getBcabank()+"','"+xBlock.getBcainsurance()+"','"+xBlock.getBcasyariah()+"','"+xBlock.getBcafinancial()+"','"+xBlock.getBcasekuritas()+"')");
+			
+			db.closeDB();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if(xBlock.getBcabank().equals("1")) {
+			RestTemplate restTemplate = new RestTemplate();
+	         String url = "http://localhost:8090/bankBlock";
+	         HttpHeaders headers = new HttpHeaders();
+	         headers.setContentType(MediaType.APPLICATION_JSON);
+	         JSONObject postdata = new JSONObject();
+	         //Block blok = new Block(mBlock.getFirstname(),mBlock.getLastname(),mBlock.getDob(), mBlock.getAddress(), mBlock.getEmail(), mBlock.getKtp(), mBlock.getNationality(), mBlock.getPhoto(), mBlock.getAccountnum());
+	         try {
+	             postdata.put("firstname",xBlock.getFirstname());
+	             postdata.put("lastname",xBlock.getLastname());
+	             postdata.put("ktp",xBlock.getKtp());
+	             postdata.put("email",xBlock.getEmail());
+	             postdata.put("dob",xBlock.getDob());
+	             postdata.put("address",xBlock.getAddress());
+	             postdata.put("nationality",xBlock.getNationality());
+	             postdata.put("accountnum",xBlock.getAccountnum());
+	             postdata.put("photo",xBlock.getPhoto());
+	         }
+	         catch (JSONException e)
+	         {
+	             e.printStackTrace();
+	         }
+	         String requestJson = postdata.toString();
+	         HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
+	         String answer = restTemplate.postForObject(url, entity, String.class);
+	         System.out.println(answer);
+		}
+		
+		return xBlock;
+	}
+	
+	
 	@PostMapping("/newBlock")
 	public Block newBlock(@RequestBody Block mBlock) {
 		System.out.println(mBlock.getFirstname());
@@ -173,6 +285,18 @@ public class MainController {
 	         String answer = restTemplate.postForObject(url, entity, String.class);
 	         System.out.println(answer);
 		}
+		
+		
+		try {
+			db.openDB();
+			db.executeUpdate("delete from mstemp where ktp ='"+mBlock.getKtp()+"'");
+			db.closeDB();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		
 		return mBlock;
 	}
 	
