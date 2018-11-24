@@ -35,6 +35,17 @@ public class BlockService {
 
 	ArrayList<Block> alBlock = new ArrayList<Block>();
 	
+	public static boolean verifyECDSASig(PublicKey publicKey, String data, byte[] signature) {
+        try {
+            Signature ecdsaVerify = Signature.getInstance("ECDSA", "BC");
+            ecdsaVerify.initVerify(publicKey);
+            ecdsaVerify.update(data.getBytes());
+            return ecdsaVerify.verify(signature);
+        }catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+	
 	public static byte[] applyECDSASig(PrivateKey privateKey, String input){
 		Signature dsa;
 		byte[] output = new byte[0];

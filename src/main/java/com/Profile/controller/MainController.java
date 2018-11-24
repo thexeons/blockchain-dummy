@@ -44,8 +44,6 @@ public class MainController {
 	ConnectDB db = new ConnectDB();
 	RestTemplate rt = new RestTemplate();
 	
-	public String base64privateKey1 = "MIGNAgEAMBMGByqGSM49AgEGCCqGSM49AwEEBHMwcQIBAQQeD5os95M4dUv/w/X3iNs1Q+MQnRn6ARetYPbHsdOWoAoGCCqGSM49AwEEoUADPgAEdRjqcQG0/6qisxiTnXW8XhZZwp3SsGXV1WXXEfxqAWAwBLgjOHX7/Sw0+5kKNACoZ0cwDVOf3NeJTkbW";
-	public PrivateKey privatekey;
 
 	ArrayList<Block> alBlock = new ArrayList<Block>();
 	public static int difficulty = 2;
@@ -178,6 +176,8 @@ public class MainController {
 		return mBlock;
 	}
 	
+	
+	/*
 	@PostMapping("/verifyBlock")
 	public String verifyBlock(@RequestBody Block mBlock){
 
@@ -266,7 +266,7 @@ public class MainController {
         	return "False";
         }
 	}
-	
+	*/
 	@PostMapping("/test")
 	public Block test(@RequestBody Block mBlock) {
 		System.out.println(mBlock.getFirstname());
