@@ -4,6 +4,7 @@ import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -96,6 +97,63 @@ public class MainController {
 //		return mBlock;
 //	}
 	
+	@PostMapping("/updateBlock")
+	public Block updateBlock(@RequestBody Block uBlock) {
+		
+		try {
+			db.openDB();
+			db.executeUpdate("insert into mstemp(firstname,lastname,ktp,email,dob,address,nationality,accountnum,photo,verified,bcabank,bcainsurance,bcasyariah,bcafinancial,bcasekuritas) values "
+					+ "('"+uBlock.getFirstname()+"','"+uBlock.getLastname()+"','"+uBlock.getKtp()+"','"+uBlock.getEmail()+"','"+uBlock.getDob()+"','"+uBlock.getAddress()+"','"+uBlock.getNationality()+"','"+uBlock.getAccountnum()+"','"+uBlock.getPhoto()+"','"+uBlock.getVerified()+"','"+uBlock.getBcabank()+"','"+uBlock.getBcainsurance()+"','"+uBlock.getBcasyariah()+"','"+uBlock.getBcafinancial()+"','"+uBlock.getBcasekuritas()+"')");
+			db.closeDB();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		if(uBlock.getBcabank().equals("1")) {
+			RestTemplate restTemplate = new RestTemplate();
+	         String url = "http://localhost:8090/getUpdate";
+	         HttpHeaders headers = new HttpHeaders();
+	         headers.setContentType(MediaType.APPLICATION_JSON);
+	         JSONObject postdata = new JSONObject();
+	         try {
+	             postdata.put("firstname",uBlock.getFirstname());
+	             postdata.put("lastname",uBlock.getLastname());
+	             postdata.put("ktp",uBlock.getKtp());
+	             postdata.put("email",uBlock.getEmail());
+	             postdata.put("dob",uBlock.getDob());
+	             postdata.put("address",uBlock.getAddress());
+	             postdata.put("nationality",uBlock.getNationality());
+	             postdata.put("accountnum",uBlock.getAccountnum());
+	             postdata.put("photo",uBlock.getPhoto());
+	         }
+	         catch (JSONException e)
+	         {
+	             e.printStackTrace();
+	         }
+	         String requestJson = postdata.toString();
+	         HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
+	         String answer = restTemplate.postForObject(url, entity, String.class);
+	         System.out.println(answer);
+		}
+		
+		return uBlock;
+		
+	}
+	
+	
+	@PostMapping("/masterRejectBlock")
+	public String returnResponse(@RequestBody Block mBlock) {
+		try {
+			db.openDB();
+			db.executeUpdate("delete from mstemp where ktp ='"+mBlock.getKtp()+"'");
+			db.closeDB();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "Done";
+	}
+	
+	
 	@PostMapping("/getUserDetail")
 	public String getUserStatus(@RequestBody Block uBlock) {
 		
@@ -153,8 +211,7 @@ public class MainController {
             postdata.put("bcainsurance",insuranceStatus);
             postdata.put("bcafinancial",financialStatus);
         }
-        catch (JSONException e)
-        {
+        catch (JSONException e){
             e.printStackTrace();
         }
         
@@ -167,12 +224,11 @@ public class MainController {
 		try {
 			db.openDB();
 			Thread.sleep(100);
-			db.executeUpdate("insert into mstemp(firstname,lastname,ktp,email,dob,address,nationality,accountnum,photo,verified,bcabank,bcainsurance,bcasyariah,bcafinancial	,bcasekuritas) values "
+			db.executeUpdate("insert into mstemp(firstname,lastname,ktp,email,dob,address,nationality,accountnum,photo,verified,bcabank,bcainsurance,bcasyariah,bcafinancial,bcasekuritas) values "
 					+ "('"+xBlock.getFirstname()+"','"+xBlock.getLastname()+"','"+xBlock.getKtp()+"','"+xBlock.getEmail()+"','"+xBlock.getDob()+"','"+xBlock.getAddress()+"','"+xBlock.getNationality()+"','"+xBlock.getAccountnum()+"','"+xBlock.getPhoto()+"','"+xBlock.getVerified()+"','"+xBlock.getBcabank()+"','"+xBlock.getBcainsurance()+"','"+xBlock.getBcasyariah()+"','"+xBlock.getBcafinancial()+"','"+xBlock.getBcasekuritas()+"')");
 			
 			db.closeDB();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -260,7 +316,7 @@ public class MainController {
 		
 		if(mBlock.getBcabank().equals("1")) {
 			RestTemplate restTemplate = new RestTemplate();
-	         String url = "http://192.168.43.171:8090/bankBlock";
+	         String url = "http://localhost:8090/bankBlock";
 	         HttpHeaders headers = new HttpHeaders();
 	         headers.setContentType(MediaType.APPLICATION_JSON);
 	         JSONObject postdata = new JSONObject();
@@ -434,30 +490,8 @@ public class MainController {
 		return mPersonService.replacePerson(newPerson, id);
 	}
 	
-	//Haha
+	//View Block
 	public java.util.List<Block> getBlock() {
-//		try {
-//			db.openDB();
-//			rs= db.executeQuery("select firstname from msdata");
-//			alBlock = new ArrayList<Block>();
-//			while(rs.next()) {
-//				if(alBlock.isEmpty()) {
-//					alBlock.add(new Block(rs.getString(1),"0"));
-//					alBlock.get(alBlock.size()-1).mineBlock(difficulty);
-//					Thread.sleep(100);	
-//				}
-//				else {
-//					alBlock.add(new Block(rs.getString(1),alBlock.get(alBlock.size()-1).getHash()));
-//					alBlock.get(alBlock.size()-1).mineBlock(difficulty);
-//					Thread.sleep(100);
-//				}
-//			}
-//			db.closeDB();
-//		} catch (Exception	 e) {
-//			e.printStackTrace();
-//		}
-//		System.out.println(alBlock.get(0));
-		
 		alBlock = new ArrayList<Block>();
 		try {
 			db.openDB();
@@ -469,7 +503,6 @@ public class MainController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 		return alBlock;
 	}
 }
