@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.Profile.model.Block;
+import com.Profile.model.User;
 import com.Profile.model.Person;
 import com.Profile.service.BlockService;
 import com.Profile.service.ConnectDB;
@@ -140,9 +141,107 @@ public class MainController {
 		
 	}
 	
+	//Try Login
+	@PostMapping("/verifyLogin")
+	public String verifyLogin(@RequestBody User xUser) {
+		 String tempUsername = xUser.getUsername();
+		 String tempPassword = xUser.getPassword();
+		 ArrayList<String> alTryLogin = new ArrayList<String>();
+		 
+		 System.out.println(tempUsername);
+		 System.out.println(tempPassword);
+		 
+		 try {
+			db.openDB();
+			rs = db.executeQuery("select * from msuser where username like '"+tempUsername+"' and password like '"+tempPassword+"'");
+			while(rs.next()) {
+				alTryLogin.add(rs.getString(1));
+				alTryLogin.add(rs.getString(2));
+				alTryLogin.add(rs.getString(3));
+			}
+			db.closeDB();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		 if(alTryLogin.size()==0) {
+			 return "0";
+		 }
+		 else {
+			 return "1";
+		 } 
+	}
+	
+	//Try Register
+	@PostMapping("/verifyRegister")
+	public String verifyRegister(@RequestBody User xUser) {
+		String tempUsername = xUser.getUsername();
+		String tempPassword = xUser.getPassword();
+		String tempKtp = xUser.getKtp();
+		String warning = "-1";
+		
+		String flagUser = "-1";
+		String flagKtp = "-1";
+		
+		
+		ArrayList<String> alTryRegister = new ArrayList<String>();
+		//1 = ktp exist
+		//2 = username exist
+		//3 = both exist
+		//4 = sukses
+		//Check KTP
+		try {
+			db.openDB();
+			rs = db.executeQuery("select * from msuser where ktp ='"+tempKtp+"'");
+			while(rs.next()) {
+				alTryRegister.add(rs.getString(1));
+				alTryRegister.add(rs.getString(2));
+				alTryRegister.add(rs.getString(3));
+			}
+			db.closeDB();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(alTryRegister.size()==0) {
+			flagKtp	="1";
+		}
+		
+		//Check KTP
+		try {
+			db.openDB();
+			rs = db.executeQuery("select * from msuser where username ='"+tempUsername+"'");
+			while(rs.next()) {
+				alTryRegister.add(rs.getString(1));
+				alTryRegister.add(rs.getString(2));
+				alTryRegister.add(rs.getString(3));
+			}
+			db.closeDB();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(alTryRegister.size()==0) {
+			flagUser="1";
+		}
+		
+		
+		if(flagKtp.equals("1")) {
+			warning ="1";
+		}
+		if(flagUser.equals("1")) {
+			warning ="2";
+		}
+		if(flagUser.equals("1") && flagKtp.equals("1")) {
+			warning ="3";
+		}
+		if(flagUser.equals("-1") && flagKtp.equals("-1")) {
+			warning ="4";
+		}
+
+		return warning;
+	}
 	
 	@PostMapping("/masterRejectBlock")
-	public String returnResponse(@RequestBody Block mBlock) {
+	public String returnRejectResponse(@RequestBody Block mBlock) {
 		try {
 			db.openDB();
 			db.executeUpdate("delete from mstemp where ktp ='"+mBlock.getKtp()+"'");
