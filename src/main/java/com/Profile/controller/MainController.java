@@ -856,13 +856,15 @@ public class MainController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 		 if(alTryLogin.size()==0) {
 			 return "0";
 		 }
 		 else {
+			 System.out.println(tempUsername+" has logged in!");
 			 return "1";
 		 } 
+		 
+		 
 	}
 	
 	//Try Register
@@ -946,6 +948,7 @@ public class MainController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println(xUser.getUsername()+" has registered.");
 		return "x";
 	}
 	
@@ -1076,6 +1079,8 @@ public class MainController {
 	         String answer = restTemplate.postForObject(url, entity, String.class);
 	         System.out.println(answer);
 		}
+		
+		System.out.println(xBlock.getFirstname()+" "+xBlock.getLastname()+" "+" has registered.");
 		
 		return xBlock;
 	}
