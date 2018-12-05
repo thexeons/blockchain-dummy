@@ -57,6 +57,29 @@ public class Block {
 		this.bcasekuritas = bcasekuritas;
 	}
 	
+	public Block(String id,String firstname, String lastname, String ktp, String email, String dob, String address, String nationality, String accountnum, String photo, String verified, String timestamp, String nonce, String bcabank, String bcainsurance, String bcasyariah, String bcafinancial, String bcasekuritas, String hash, String previoushash) {
+		this.id = id;
+		this.firstname = firstname;
+		this.lastname = lastname;
+		this.ktp = ktp;
+		this.email = email;
+		this.dob = dob;
+		this.address = address;
+		this.nationality = nationality;
+		this.accountnum = accountnum;
+		this.photo = photo;
+		this.verified = verified;
+		this.timeStamp = Long.parseLong(timestamp);
+		this.nonce = Integer.parseInt(nonce);
+		this.bcabank = bcabank;
+		this.bcainsurance = bcainsurance;
+		this.bcasyariah = bcasyariah;
+		this.bcafinancial = bcafinancial;
+		this.bcasekuritas = bcasekuritas;
+		this.hash = hash;
+		this.previousHash = previoushash;	
+	}
+	
 	public Block(String id,String firstname, String lastname, String ktp, String email, String dob, String address, String nationality, String accountnum,String photo,String verified, String previousHash,String hash,int nonce,String bcabank,String bcainsurance,String bcasyariah,String bcafinancial,String bcasekuritas){
 		this.id = id;
 		this.firstname = firstname;
@@ -93,8 +116,8 @@ public class Block {
 	}
 	
 	
-	public Block(String firstname) {
-		this.firstname = firstname;
+	public Block(String id) {
+		this.id = id;
 	}
 	
 	public Block(String signature, String data) {

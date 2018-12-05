@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.Profile.model.Block;
+import com.Profile.model.SendBlock;
 import com.Profile.model.User;
 import com.Profile.model.Person;
 import com.Profile.service.BlockService;
@@ -46,8 +47,20 @@ public class MainController {
 	ConnectDB db = new ConnectDB();
 	RestTemplate rt = new RestTemplate();
 	
-
+	public static final String  master1 = "192.168.43.219";
+	public static final String  master2 = "192.168.43.171";
+	public static final String  master3 = "192.168.43.219";
+	public static final String  master4 = "192.168.43.219";
+	public static final String  master5 = "192.168.43.219";
+	
+	public static final String  unit1 = "192.168.43.219";
+	public static final String  unit2 = "192.168.43.171";
+	public static final String  unit3 = "192.168.43.219";
+	public static final String  unit4 = "192.168.43.219";
+	public static final String  unit5 = "192.168.43.219";
+		
 	ArrayList<Block> alBlock = new ArrayList<Block>();
+	ArrayList<SendBlock> sendBlock = new ArrayList<SendBlock>();
 	public static int difficulty = 2;
 	
 	@Autowired
@@ -70,6 +83,171 @@ public class MainController {
 		System.out.println("Controller: " + getBlock());
 		return getBlock();
 	}
+	
+	@PostMapping("/receiveMissingBlocks")
+	public String receiveBlock(@RequestBody SendBlock mBlock) {
+		try {
+			db.openDB();
+			db.executeUpdate("insert into msdata(id,firstname,lastname,ktp,email,dob,address,nationality,accountnum,photo,verified,timestamp,nonce,bcabank,bcainsurance,bcasyariah,bcafinancial	,bcasekuritas) values "
+					+ "('"+mBlock.getId()+"','"+mBlock.getFirstname()+"','"+mBlock.getLastname()+"','"+mBlock.getKtp()+"','"+mBlock.getEmail()+"','"+mBlock.getDob()+"','"+mBlock.getAddress()+"','"+mBlock.getNationality()+"','"+mBlock.getAccountnum()+"','"+mBlock.getPhoto()+"','"+mBlock.getVerified()+"','"+mBlock.getTimeStamp()+"','"+mBlock.getNonce()+"','"+mBlock.getBcabank()+"','"+mBlock.getBcainsurance()+"','"+mBlock.getBcasyariah()+"','"+mBlock.getBcafinancial()+"','"+mBlock.getBcasekuritas()+"')");
+			
+			db.executeUpdate("insert into mshash(id,hash,previoushash) values('"+mBlock.getId()+"','"+mBlock.getHash()+"','"+mBlock.getPreviousHash()+"')");
+			
+			db.closeDB();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "Haha";
+	}
+	
+	@PostMapping("/requestMissingBlocks")
+	public String requestBlock(@RequestBody Block uBlock){
+		
+		int getId = Integer.parseInt(uBlock.getId())+1;
+		String sendId = getId+"";
+		String currId = "";
+		
+		try {
+			db.openDB();
+			
+			rs = db.executeQuery("select id from msdata order by id desc limit 1");
+			while(rs.next()) {
+				currId = rs.getString(1);
+			}
+			db.closeDB();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		
+		sendBlock = new ArrayList<SendBlock>();
+		for(int i = Integer.parseInt(sendId);i<=Integer.parseInt(currId);i++){
+			SendBlock sb = null;
+			try {
+				db.openDB();
+				rs=db.executeQuery("select "
+						+ "msdata.id,"
+						+ "msdata.firstname,"
+						+ "msdata.lastname,"
+						+ "msdata.ktp,"
+						+ "msdata.email,"
+						+ "msdata.dob,"
+						+ "msdata.address,"
+						+ "msdata.nationality,"
+						+ "msdata.accountnum,"
+						+ "msdata.photo,"
+						+ "msdata.verified,"
+						+ "msdata.timestamp,"
+						+ "msdata.nonce,"
+						+ "msdata.bcabank,"
+						+ "msdata.bcainsurance,"
+						+ "msdata.bcasyariah,"
+						+ "msdata.bcafinancial,"
+						+ "msdata.bcasekuritas,"
+						+ "mshash.hash,"
+						+ "mshash.previoushash"
+						+ " from msdata join mshash on msdata.id = mshash.id where msdata.id ='"+i+"'");
+				while(rs.next()) {
+					sb = new SendBlock(rs.getString(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6),rs.getString(7),rs.getString(8),rs.getString(9),rs.getString(10),rs.getString(11),rs.getString(12),rs.getString(13),rs.getString(14),rs.getString(15),rs.getString(16),rs.getString(17),rs.getString(18),rs.getString(19),rs.getString(20));
+				}
+				db.closeDB();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			RestTemplate restTemplate = new RestTemplate();
+	        String url = "http://localhost:8090/receiveMissingBlocks";
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.setContentType(MediaType.APPLICATION_JSON);
+	        JSONObject postdata = new JSONObject();
+	        try {
+	        	postdata.put("id",sb.getId());
+	            postdata.put("firstname",sb.getFirstname());
+	            postdata.put("lastname",sb.getLastname());
+	            postdata.put("ktp",sb.getKtp());
+	            postdata.put("email",sb.getEmail());
+	            postdata.put("dob",sb.getDob());
+	            postdata.put("address",sb.getAddress());
+	            postdata.put("nationality",sb.getNationality());
+	            postdata.put("accountnum",sb.getAccountnum());
+	            postdata.put("photo",sb.getPhoto());
+	            postdata.put("verified",sb.getVerified());
+	            postdata.put("timestamp",sb.getTimeStamp());
+	            postdata.put("nonce",sb.getNonce());
+	            postdata.put("bcabank",sb.getBcabank());
+	            postdata.put("bcasyariah",sb.getBcasyariah());
+	            postdata.put("bcafinancial",sb.getBcafinancial());
+	            postdata.put("bcasekuritas",sb.getBcasekuritas());
+	            postdata.put("bcainsurance",sb.getBcainsurance());
+	            postdata.put("hash",sb.getHash());
+	            postdata.put("previoushash",sb.getPreviousHash());
+	        }
+	        catch (JSONException e)
+	        {
+	            e.printStackTrace();
+	        }
+	        String requestJson = postdata.toString();
+	        HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
+	        String answer = restTemplate.postForObject(url, entity, String.class);
+	        System.out.println(answer);
+			
+		}
+		
+		return "Haha";
+	}
+	
+	@PostMapping("/getLatest")
+	public String getLatest(@RequestBody SendBlock mBlock) {
+		int thisMasterId = 0;
+		try {
+			db.openDB();
+			rs = db.executeQuery("select id from msdata order by id desc limit 1");
+			while(rs.next()) {
+				thisMasterId = Integer.parseInt(rs.getString(1));
+			}
+			db.closeDB();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		int getSyncId = Integer.parseInt(mBlock.getId());
+		
+		if(getSyncId-thisMasterId ==1) {
+			try {
+				db.openDB();
+				db.executeUpdate("insert into msdata(id,firstname,lastname,ktp,email,dob,address,nationality,accountnum,photo,verified,timestamp,nonce,bcabank,bcainsurance,bcasyariah,bcafinancial	,bcasekuritas) values "
+						+ "('"+mBlock.getId()+"','"+mBlock.getFirstname()+"','"+mBlock.getLastname()+"','"+mBlock.getKtp()+"','"+mBlock.getEmail()+"','"+mBlock.getDob()+"','"+mBlock.getAddress()+"','"+mBlock.getNationality()+"','"+mBlock.getAccountnum()+"','"+mBlock.getPhoto()+"','"+mBlock.getVerified()+"','"+mBlock.getTimeStamp()+"','"+mBlock.getNonce()+"','"+mBlock.getBcabank()+"','"+mBlock.getBcainsurance()+"','"+mBlock.getBcasyariah()+"','"+mBlock.getBcafinancial()+"','"+mBlock.getBcasekuritas()+"')");
+				
+				db.executeUpdate("insert into mshash(id,hash,previoushash) values('"+mBlock.getId()+"','"+mBlock.getHash()+"','"+mBlock.getPreviousHash()+"')");
+				
+				db.closeDB();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		}
+		else {
+			RestTemplate restTemplate = new RestTemplate();
+	        String url = "http://localhost:8090/requestMissingBlocks";
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.setContentType(MediaType.APPLICATION_JSON);
+	        JSONObject postdata = new JSONObject();
+	        try {
+	            postdata.put("id",thisMasterId);
+	        }
+	        catch (JSONException e)
+	        {
+	            e.printStackTrace();
+	        }
+	        String requestJson = postdata.toString();
+	        HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
+	        String answer = restTemplate.postForObject(url, entity, String.class);
+	        System.out.println(answer);
+			
+		}
+		
+		return "x";
+	}
+	
 	
 	@GetMapping("/persons/{id}")
 	public Optional<Person> getPerson(@PathVariable("id") Long personId) {	
@@ -99,7 +277,7 @@ public class MainController {
 //	}
 	
 	//Unit to master + notify
-	@PostMapping("newUpdateBlock")
+	@PostMapping("/newUpdateBlock")
 	public Block newUpdateBlock(@RequestBody Block mBlock) {
 		String currId = "";
 		String prevHash ="";
@@ -306,6 +484,79 @@ public class MainController {
 			e.printStackTrace();
 		}
 	
+		
+		//Sync data to master 2 3 4 5
+		SendBlock sdBx = null;
+		try {
+			db.openDB();
+			rs=db.executeQuery("select "
+					+ "msdata.id,"
+					+ "msdata.firstname,"
+					+ "msdata.lastname,"
+					+ "msdata.ktp,"
+					+ "msdata.email,"
+					+ "msdata.dob,"
+					+ "msdata.address,"
+					+ "msdata.nationality,"
+					+ "msdata.accountnum,"
+					+ "msdata.photo,"
+					+ "msdata.verified,"
+					+ "msdata.timestamp,"
+					+ "msdata.nonce,"
+					+ "msdata.bcabank,"
+					+ "msdata.bcainsurance,"
+					+ "msdata.bcasyariah,"
+					+ "msdata.bcafinancial,"
+					+ "msdata.bcasekuritas,"
+					+ "mshash.hash,"
+					+ "mshash.previoushash"
+					+ " from msdata join mshash on msdata.id = mshash.id where msdata.id ='"+currId+"'");
+			while(rs.next()) {
+				sdBx = new SendBlock(rs.getString(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6),rs.getString(7),rs.getString(8),rs.getString(9),rs.getString(10),rs.getString(11),rs.getString(12),rs.getString(13),rs.getString(14),rs.getString(15),rs.getString(16),rs.getString(17),rs.getString(18),rs.getString(19),rs.getString(20));
+			}
+			db.closeDB();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:8090/getLatest";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        JSONObject postdata = new JSONObject();
+        try {
+			postdata.put("id",sdBx.getId());
+            postdata.put("firstname",sdBx.getFirstname());
+            postdata.put("lastname",sdBx.getLastname());
+            postdata.put("ktp",sdBx.getKtp());
+            postdata.put("email",sdBx.getEmail());
+            postdata.put("dob",sdBx.getDob());
+            postdata.put("address",sdBx.getAddress());
+            postdata.put("nationality",sdBx.getNationality());
+            postdata.put("accountnum",sdBx.getAccountnum());
+            postdata.put("photo",sdBx.getPhoto());
+            postdata.put("verified",sdBx.getVerified());
+            postdata.put("timestamp",sdBx.getTimeStamp());
+            postdata.put("nonce",sdBx.getNonce());
+            postdata.put("bcabank",sdBx.getBcabank());
+            postdata.put("bcasyariah",sdBx.getBcasyariah());
+            postdata.put("bcafinancial",sdBx.getBcafinancial());
+            postdata.put("bcasekuritas",sdBx.getBcasekuritas());
+            postdata.put("bcainsurance",sdBx.getBcainsurance());
+            postdata.put("hash",sdBx.getHash());
+            postdata.put("previoushash",sdBx.getPreviousHash());
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+        }
+        String requestJson = postdata.toString();
+        HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
+        String answer = restTemplate.postForObject(url, entity, String.class);
+        System.out.println(answer);
+		
+		
+		
 		return mBlock;
 	}
 	
@@ -397,7 +648,76 @@ public class MainController {
 			e.printStackTrace();
 		}
 		
-		
+		//Sync data to master 2 3 4 5
+				SendBlock sdBx = null;
+				try {
+					db.openDB();
+					rs=db.executeQuery("select "
+							+ "msdata.id,"
+							+ "msdata.firstname,"
+							+ "msdata.lastname,"
+							+ "msdata.ktp,"
+							+ "msdata.email,"
+							+ "msdata.dob,"
+							+ "msdata.address,"
+							+ "msdata.nationality,"
+							+ "msdata.accountnum,"
+							+ "msdata.photo,"
+							+ "msdata.verified,"
+							+ "msdata.timestamp,"
+							+ "msdata.nonce,"
+							+ "msdata.bcabank,"
+							+ "msdata.bcainsurance,"
+							+ "msdata.bcasyariah,"
+							+ "msdata.bcafinancial,"
+							+ "msdata.bcasekuritas,"
+							+ "mshash.hash,"
+							+ "mshash.previoushash"
+							+ " from msdata join mshash on msdata.id = mshash.id where msdata.id ='"+currId+"'");
+					while(rs.next()) {
+						sdBx = new SendBlock(rs.getString(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6),rs.getString(7),rs.getString(8),rs.getString(9),rs.getString(10),rs.getString(11),rs.getString(12),rs.getString(13),rs.getString(14),rs.getString(15),rs.getString(16),rs.getString(17),rs.getString(18),rs.getString(19),rs.getString(20));
+					}
+					db.closeDB();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				RestTemplate restTemplate = new RestTemplate();
+		        String url = "http://localhost:8090/getLatest";
+		        HttpHeaders headers = new HttpHeaders();
+		        headers.setContentType(MediaType.APPLICATION_JSON);
+		        JSONObject postdata = new JSONObject();
+		        try {
+					postdata.put("id",sdBx.getId());
+		            postdata.put("firstname",sdBx.getFirstname());
+		            postdata.put("lastname",sdBx.getLastname());
+		            postdata.put("ktp",sdBx.getKtp());
+		            postdata.put("email",sdBx.getEmail());
+		            postdata.put("dob",sdBx.getDob());
+		            postdata.put("address",sdBx.getAddress());
+		            postdata.put("nationality",sdBx.getNationality());
+		            postdata.put("accountnum",sdBx.getAccountnum());
+		            postdata.put("photo",sdBx.getPhoto());
+		            postdata.put("verified",sdBx.getVerified());
+		            postdata.put("timestamp",sdBx.getTimeStamp());
+		            postdata.put("nonce",sdBx.getNonce());
+		            postdata.put("bcabank",sdBx.getBcabank());
+		            postdata.put("bcasyariah",sdBx.getBcasyariah());
+		            postdata.put("bcafinancial",sdBx.getBcafinancial());
+		            postdata.put("bcasekuritas",sdBx.getBcasekuritas());
+		            postdata.put("bcainsurance",sdBx.getBcainsurance());
+		            postdata.put("hash",sdBx.getHash());
+		            postdata.put("previoushash",sdBx.getPreviousHash());
+		        }
+		        catch (JSONException e)
+		        {
+		            e.printStackTrace();
+		        }
+		        String requestJson = postdata.toString();
+		        HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
+		        String answer = restTemplate.postForObject(url, entity, String.class);
+		        System.out.println(answer);
+				
 		
 		return mBlock;
 	}
@@ -469,6 +789,8 @@ public class MainController {
         String requestJson = postdata.toString();
 		return requestJson;
 	}
+	
+	
 	
 	
 	//send update block for verification
@@ -554,6 +876,9 @@ public class MainController {
 		String flagUser = "-1";
 		String flagKtp = "-1";
 		
+		System.out.println(xUser.getPassword());
+		System.out.println(xUser.getUsername());
+		System.out.println(xUser.getKtp());
 		
 		ArrayList<String> alTryRegister = new ArrayList<String>();
 		//1 = ktp exist
@@ -573,10 +898,11 @@ public class MainController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if(alTryRegister.size()==0) {
+		if(alTryRegister.size()!=0) {
 			flagKtp	="1";
 		}
-		
+
+		alTryRegister = new ArrayList<String>();
 		//Check KTP
 		try {
 			db.openDB();
@@ -590,7 +916,7 @@ public class MainController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if(alTryRegister.size()==0) {
+		if(alTryRegister.size()!=0) {
 			flagUser="1";
 		}
 		
@@ -610,6 +936,19 @@ public class MainController {
 
 		return warning;
 	}
+	
+	@PostMapping("/submitUser")
+	public String submitUser(@RequestBody User xUser) {
+		try {
+			db.openDB();
+			db.executeUpdate("insert into msuser (ktp,username,password) values ('"+xUser.getKtp()+"','"+xUser.getUsername()+"','"+xUser.getPassword()+"')");
+			db.closeDB();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "x";
+	}
+	
 	
 	@PostMapping("/masterRejectBlock")
 	public String returnRejectResponse(@RequestBody Block mBlock) {
