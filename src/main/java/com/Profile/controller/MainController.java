@@ -154,12 +154,15 @@ public class MainController {
 				e.printStackTrace();
 			}
 			
+			
 			RestTemplate restTemplate = new RestTemplate();
-	        String url = "http://localhost:8090/receiveMissingBlocks";
+	        String url = "http://192.168.43.171:8095/receiveMissingBlocks";
 	        HttpHeaders headers = new HttpHeaders();
 	        headers.setContentType(MediaType.APPLICATION_JSON);
 	        JSONObject postdata = new JSONObject();
 	        try {
+
+				System.out.println(sb.getId());
 	        	postdata.put("id",sb.getId());
 	            postdata.put("firstname",sb.getFirstname());
 	            postdata.put("lastname",sb.getLastname());
@@ -611,6 +614,7 @@ public class MainController {
 			e.printStackTrace();
 		}
 		
+		/*
 		if(mBlock.getBcabank().equals("1")) {
 			RestTemplate restTemplate = new RestTemplate();
 	         String url = "http://localhost:8090/bankBlock";
@@ -638,7 +642,7 @@ public class MainController {
 	         String answer = restTemplate.postForObject(url, entity, String.class);
 	         System.out.println(answer);
 		}
-		
+		*/
 		
 		try {
 			db.openDB();
@@ -683,7 +687,7 @@ public class MainController {
 				}
 				
 				RestTemplate restTemplate = new RestTemplate();
-		        String url = "http://localhost:8090/getLatest";
+		        String url = "http://192.168.43.171:8095/getLatest";
 		        HttpHeaders headers = new HttpHeaders();
 		        headers.setContentType(MediaType.APPLICATION_JSON);
 		        JSONObject postdata = new JSONObject();
