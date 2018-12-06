@@ -100,6 +100,7 @@ public class MainController {
 		return "Haha";
 	}
 	
+	/*
 	@PostMapping("/requestMissingBlocks")
 	public String requestBlock(@RequestBody Block uBlock){
 		
@@ -197,6 +198,7 @@ public class MainController {
 		
 		return "Haha";
 	}
+	*/
 	
 	@PostMapping("/getLatest")
 	public String getLatest(@RequestBody SendBlock mBlock) {
@@ -223,12 +225,14 @@ public class MainController {
 				db.executeUpdate("insert into mshash(id,hash,previoushash) values('"+mBlock.getId()+"','"+mBlock.getHash()+"','"+mBlock.getPreviousHash()+"')");
 				
 				db.closeDB();
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
+			return "Complete";
 		}
 		else {
+			/*
 			RestTemplate restTemplate = new RestTemplate();
 	        String url = "http://localhost:8090/requestMissingBlocks";
 	        HttpHeaders headers = new HttpHeaders();
@@ -245,10 +249,10 @@ public class MainController {
 	        HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
 	        String answer = restTemplate.postForObject(url, entity, String.class);
 	        System.out.println(answer);
-			
+	        */
+	        return "Missing-"+thisMasterId;
 		}
 		
-		return "x";
 	}
 	
 	
@@ -522,8 +526,9 @@ public class MainController {
 			e.printStackTrace();
 		}
 		
+		//Sync from Here to second Master
 		RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:8090/getLatest";
+        String url = "http://192.168.43.171:8095/getLatest";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         JSONObject postdata = new JSONObject();
@@ -557,7 +562,107 @@ public class MainController {
         HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
         String answer = restTemplate.postForObject(url, entity, String.class);
         System.out.println(answer);
-		
+        
+        String[] answerParts = answer.split("-");
+        String answerResult = answerParts[0];
+        String answerId = answerParts[1];
+        
+        if(answerResult.equals("Missing")) {
+        	int getId = Integer.parseInt(answerId)+1;
+    		String sendId = getId+"";
+    		String currIdx = "";
+    		
+    		try {
+    			db.openDB();
+    			
+    			rs = db.executeQuery("select id from msdata order by id desc limit 1");
+    			while(rs.next()) {
+    				currIdx = rs.getString(1);
+    			}
+    			db.closeDB();
+    		} catch (Exception e1) {
+    			e1.printStackTrace();
+    		}
+    		
+    		sendBlock = new ArrayList<SendBlock>();
+    		for(int i = Integer.parseInt(sendId);i<=Integer.parseInt(currIdx);i++){
+    			SendBlock sb = null;
+    			try {
+    				db.openDB();
+    				rs=db.executeQuery("select "
+    						+ "msdata.id,"
+    						+ "msdata.firstname,"
+    						+ "msdata.lastname,"
+    						+ "msdata.ktp,"
+    						+ "msdata.email,"
+    						+ "msdata.dob,"
+    						+ "msdata.address,"
+    						+ "msdata.nationality,"
+    						+ "msdata.accountnum,"
+    						+ "msdata.photo,"
+    						+ "msdata.verified,"
+    						+ "msdata.timestamp,"
+    						+ "msdata.nonce,"
+    						+ "msdata.bcabank,"
+    						+ "msdata.bcainsurance,"
+    						+ "msdata.bcasyariah,"
+    						+ "msdata.bcafinancial,"
+    						+ "msdata.bcasekuritas,"
+    						+ "mshash.hash,"
+    						+ "mshash.previoushash"
+    						+ " from msdata join mshash on msdata.id = mshash.id where msdata.id ='"+i+"'");
+    				while(rs.next()) {
+    					sb = new SendBlock(rs.getString(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6),rs.getString(7),rs.getString(8),rs.getString(9),rs.getString(10),rs.getString(11),rs.getString(12),rs.getString(13),rs.getString(14),rs.getString(15),rs.getString(16),rs.getString(17),rs.getString(18),rs.getString(19),rs.getString(20));
+    				}
+    				db.closeDB();
+    			} catch (Exception e) {
+    				e.printStackTrace();
+    			}
+    			
+    			
+    			RestTemplate restTemplatex1 = new RestTemplate();
+    	        String urlx1 = "http://192.168.43.171:8095/receiveMissingBlocks";
+    	        HttpHeaders headersx1 = new HttpHeaders();
+    	        headersx1.setContentType(MediaType.APPLICATION_JSON);
+    	        JSONObject postdatax1 = new JSONObject();
+    	        try {
+
+    				System.out.println(sb.getId());
+    	        	postdatax1.put("id",sb.getId());
+    	            postdatax1.put("firstname",sb.getFirstname());
+    	            postdatax1.put("lastname",sb.getLastname());
+    	            postdatax1.put("ktp",sb.getKtp());
+    	            postdatax1.put("email",sb.getEmail());
+    	            postdatax1.put("dob",sb.getDob());
+    	            postdatax1.put("address",sb.getAddress());
+    	            postdatax1.put("nationality",sb.getNationality());
+    	            postdatax1.put("accountnum",sb.getAccountnum());
+    	            postdatax1.put("photo",sb.getPhoto());
+    	            postdatax1.put("verified",sb.getVerified());
+    	            postdatax1.put("timestamp",sb.getTimeStamp());
+    	            postdatax1.put("nonce",sb.getNonce());
+    	            postdatax1.put("bcabank",sb.getBcabank());
+    	            postdatax1.put("bcasyariah",sb.getBcasyariah());
+    	            postdatax1.put("bcafinancial",sb.getBcafinancial());
+    	            postdatax1.put("bcasekuritas",sb.getBcasekuritas());
+    	            postdatax1.put("bcainsurance",sb.getBcainsurance());
+    	            postdatax1.put("hash",sb.getHash());
+    	            postdatax1.put("previoushash",sb.getPreviousHash());
+    	        }
+    	        catch (JSONException e)
+    	        {
+    	            e.printStackTrace();
+    	        }
+    	        String requestJsonx1 = postdatax1.toString();
+    	        HttpEntity<String> entityx1 = new HttpEntity<String>(requestJsonx1,headersx1);
+    	        String answerx1 = restTemplatex1.postForObject(urlx1, entityx1, String.class);
+    	        System.out.println(answerx1);
+    			
+    		}
+        }
+        
+        //Sync End Here
+	
 		
 		
 		return mBlock;
@@ -614,36 +719,6 @@ public class MainController {
 			e.printStackTrace();
 		}
 		
-		/*
-		if(mBlock.getBcabank().equals("1")) {
-			RestTemplate restTemplate = new RestTemplate();
-	         String url = "http://localhost:8090/bankBlock";
-	         HttpHeaders headers = new HttpHeaders();
-	         headers.setContentType(MediaType.APPLICATION_JSON);
-	         JSONObject postdata = new JSONObject();
-	         //Block blok = new Block(mBlock.getFirstname(),mBlock.getLastname(),mBlock.getDob(), mBlock.getAddress(), mBlock.getEmail(), mBlock.getKtp(), mBlock.getNationality(), mBlock.getPhoto(), mBlock.getAccountnum());
-	         try {
-	             postdata.put("firstname",mBlock.getFirstname());
-	             postdata.put("lastname",mBlock.getLastname());
-	             postdata.put("ktp",mBlock.getKtp());
-	             postdata.put("email",mBlock.getEmail());
-	             postdata.put("dob",mBlock.getDob());
-	             postdata.put("address",mBlock.getAddress());
-	             postdata.put("nationality",mBlock.getNationality());
-	             postdata.put("accountnum",mBlock.getAccountnum());
-	             postdata.put("photo",mBlock.getPhoto());
-	         }
-	         catch (JSONException e)
-	         {
-	             e.printStackTrace();
-	         }
-	         String requestJson = postdata.toString();
-	         HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
-	         String answer = restTemplate.postForObject(url, entity, String.class);
-	         System.out.println(answer);
-		}
-		*/
-		
 		try {
 			db.openDB();
 			db.executeUpdate("delete from mstemp where ktp ='"+mBlock.getKtp()+"'");
@@ -653,76 +728,177 @@ public class MainController {
 		}
 		
 		//Sync data to master 2 3 4 5
-				SendBlock sdBx = null;
-				try {
-					db.openDB();
-					rs=db.executeQuery("select "
-							+ "msdata.id,"
-							+ "msdata.firstname,"
-							+ "msdata.lastname,"
-							+ "msdata.ktp,"
-							+ "msdata.email,"
-							+ "msdata.dob,"
-							+ "msdata.address,"
-							+ "msdata.nationality,"
-							+ "msdata.accountnum,"
-							+ "msdata.photo,"
-							+ "msdata.verified,"
-							+ "msdata.timestamp,"
-							+ "msdata.nonce,"
-							+ "msdata.bcabank,"
-							+ "msdata.bcainsurance,"
-							+ "msdata.bcasyariah,"
-							+ "msdata.bcafinancial,"
-							+ "msdata.bcasekuritas,"
-							+ "mshash.hash,"
-							+ "mshash.previoushash"
-							+ " from msdata join mshash on msdata.id = mshash.id where msdata.id ='"+currId+"'");
-					while(rs.next()) {
-						sdBx = new SendBlock(rs.getString(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6),rs.getString(7),rs.getString(8),rs.getString(9),rs.getString(10),rs.getString(11),rs.getString(12),rs.getString(13),rs.getString(14),rs.getString(15),rs.getString(16),rs.getString(17),rs.getString(18),rs.getString(19),rs.getString(20));
-					}
-					db.closeDB();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				
-				RestTemplate restTemplate = new RestTemplate();
-		        String url = "http://192.168.43.171:8095/getLatest";
-		        HttpHeaders headers = new HttpHeaders();
-		        headers.setContentType(MediaType.APPLICATION_JSON);
-		        JSONObject postdata = new JSONObject();
-		        try {
-					postdata.put("id",sdBx.getId());
-		            postdata.put("firstname",sdBx.getFirstname());
-		            postdata.put("lastname",sdBx.getLastname());
-		            postdata.put("ktp",sdBx.getKtp());
-		            postdata.put("email",sdBx.getEmail());
-		            postdata.put("dob",sdBx.getDob());
-		            postdata.put("address",sdBx.getAddress());
-		            postdata.put("nationality",sdBx.getNationality());
-		            postdata.put("accountnum",sdBx.getAccountnum());
-		            postdata.put("photo",sdBx.getPhoto());
-		            postdata.put("verified",sdBx.getVerified());
-		            postdata.put("timestamp",sdBx.getTimeStamp());
-		            postdata.put("nonce",sdBx.getNonce());
-		            postdata.put("bcabank",sdBx.getBcabank());
-		            postdata.put("bcasyariah",sdBx.getBcasyariah());
-		            postdata.put("bcafinancial",sdBx.getBcafinancial());
-		            postdata.put("bcasekuritas",sdBx.getBcasekuritas());
-		            postdata.put("bcainsurance",sdBx.getBcainsurance());
-		            postdata.put("hash",sdBx.getHash());
-		            postdata.put("previoushash",sdBx.getPreviousHash());
-		        }
-		        catch (JSONException e)
-		        {
-		            e.printStackTrace();
-		        }
-		        String requestJson = postdata.toString();
-		        HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
-		        String answer = restTemplate.postForObject(url, entity, String.class);
-		        System.out.println(answer);
-				
+		SendBlock sdBx = null;
+		try {
+			db.openDB();
+			rs=db.executeQuery("select "
+					+ "msdata.id,"
+					+ "msdata.firstname,"
+					+ "msdata.lastname,"
+					+ "msdata.ktp,"
+					+ "msdata.email,"
+					+ "msdata.dob,"
+					+ "msdata.address,"
+					+ "msdata.nationality,"
+					+ "msdata.accountnum,"
+					+ "msdata.photo,"
+					+ "msdata.verified,"
+					+ "msdata.timestamp,"
+					+ "msdata.nonce,"
+					+ "msdata.bcabank,"
+					+ "msdata.bcainsurance,"
+					+ "msdata.bcasyariah,"
+					+ "msdata.bcafinancial,"
+					+ "msdata.bcasekuritas,"
+					+ "mshash.hash,"
+					+ "mshash.previoushash"
+					+ " from msdata join mshash on msdata.id = mshash.id where msdata.id ='"+currId+"'");
+			while(rs.next()) {
+				sdBx = new SendBlock(rs.getString(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6),rs.getString(7),rs.getString(8),rs.getString(9),rs.getString(10),rs.getString(11),rs.getString(12),rs.getString(13),rs.getString(14),rs.getString(15),rs.getString(16),rs.getString(17),rs.getString(18),rs.getString(19),rs.getString(20));
+			}
+			db.closeDB();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
+		
+		//Sync from Here to second Master
+		RestTemplate restTemplate = new RestTemplate();
+        String url = "http://192.168.43.171:8095/getLatest";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        JSONObject postdata = new JSONObject();
+        try {
+			postdata.put("id",sdBx.getId());
+            postdata.put("firstname",sdBx.getFirstname());
+            postdata.put("lastname",sdBx.getLastname());
+            postdata.put("ktp",sdBx.getKtp());
+            postdata.put("email",sdBx.getEmail());
+            postdata.put("dob",sdBx.getDob());
+            postdata.put("address",sdBx.getAddress());
+            postdata.put("nationality",sdBx.getNationality());
+            postdata.put("accountnum",sdBx.getAccountnum());
+            postdata.put("photo",sdBx.getPhoto());
+            postdata.put("verified",sdBx.getVerified());
+            postdata.put("timestamp",sdBx.getTimeStamp());
+            postdata.put("nonce",sdBx.getNonce());
+            postdata.put("bcabank",sdBx.getBcabank());
+            postdata.put("bcasyariah",sdBx.getBcasyariah());
+            postdata.put("bcafinancial",sdBx.getBcafinancial());
+            postdata.put("bcasekuritas",sdBx.getBcasekuritas());
+            postdata.put("bcainsurance",sdBx.getBcainsurance());
+            postdata.put("hash",sdBx.getHash());
+            postdata.put("previoushash",sdBx.getPreviousHash());
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+        }
+        String requestJson = postdata.toString();
+        HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
+        String answer = restTemplate.postForObject(url, entity, String.class);
+        System.out.println(answer);
+        
+        String[] answerParts = answer.split("-");
+        String answerResult = answerParts[0];
+        String answerId = answerParts[1];
+        
+        if(answerResult.equals("Missing")) {
+        	int getId = Integer.parseInt(answerId)+1;
+    		String sendId = getId+"";
+    		String currIdx = "";
+    		
+    		try {
+    			db.openDB();
+    			
+    			rs = db.executeQuery("select id from msdata order by id desc limit 1");
+    			while(rs.next()) {
+    				currIdx = rs.getString(1);
+    			}
+    			db.closeDB();
+    		} catch (Exception e1) {
+    			e1.printStackTrace();
+    		}
+    		
+    		sendBlock = new ArrayList<SendBlock>();
+    		for(int i = Integer.parseInt(sendId);i<=Integer.parseInt(currIdx);i++){
+    			SendBlock sb = null;
+    			try {
+    				db.openDB();
+    				rs=db.executeQuery("select "
+    						+ "msdata.id,"
+    						+ "msdata.firstname,"
+    						+ "msdata.lastname,"
+    						+ "msdata.ktp,"
+    						+ "msdata.email,"
+    						+ "msdata.dob,"
+    						+ "msdata.address,"
+    						+ "msdata.nationality,"
+    						+ "msdata.accountnum,"
+    						+ "msdata.photo,"
+    						+ "msdata.verified,"
+    						+ "msdata.timestamp,"
+    						+ "msdata.nonce,"
+    						+ "msdata.bcabank,"
+    						+ "msdata.bcainsurance,"
+    						+ "msdata.bcasyariah,"
+    						+ "msdata.bcafinancial,"
+    						+ "msdata.bcasekuritas,"
+    						+ "mshash.hash,"
+    						+ "mshash.previoushash"
+    						+ " from msdata join mshash on msdata.id = mshash.id where msdata.id ='"+i+"'");
+    				while(rs.next()) {
+    					sb = new SendBlock(rs.getString(1),rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6),rs.getString(7),rs.getString(8),rs.getString(9),rs.getString(10),rs.getString(11),rs.getString(12),rs.getString(13),rs.getString(14),rs.getString(15),rs.getString(16),rs.getString(17),rs.getString(18),rs.getString(19),rs.getString(20));
+    				}
+    				db.closeDB();
+    			} catch (Exception e) {
+    				e.printStackTrace();
+    			}
+    			
+    			
+    			RestTemplate restTemplatex1 = new RestTemplate();
+    	        String urlx1 = "http://192.168.43.171:8095/receiveMissingBlocks";
+    	        HttpHeaders headersx1 = new HttpHeaders();
+    	        headersx1.setContentType(MediaType.APPLICATION_JSON);
+    	        JSONObject postdatax1 = new JSONObject();
+    	        try {
+
+    				System.out.println(sb.getId());
+    	        	postdatax1.put("id",sb.getId());
+    	            postdatax1.put("firstname",sb.getFirstname());
+    	            postdatax1.put("lastname",sb.getLastname());
+    	            postdatax1.put("ktp",sb.getKtp());
+    	            postdatax1.put("email",sb.getEmail());
+    	            postdatax1.put("dob",sb.getDob());
+    	            postdatax1.put("address",sb.getAddress());
+    	            postdatax1.put("nationality",sb.getNationality());
+    	            postdatax1.put("accountnum",sb.getAccountnum());
+    	            postdatax1.put("photo",sb.getPhoto());
+    	            postdatax1.put("verified",sb.getVerified());
+    	            postdatax1.put("timestamp",sb.getTimeStamp());
+    	            postdatax1.put("nonce",sb.getNonce());
+    	            postdatax1.put("bcabank",sb.getBcabank());
+    	            postdatax1.put("bcasyariah",sb.getBcasyariah());
+    	            postdatax1.put("bcafinancial",sb.getBcafinancial());
+    	            postdatax1.put("bcasekuritas",sb.getBcasekuritas());
+    	            postdatax1.put("bcainsurance",sb.getBcainsurance());
+    	            postdatax1.put("hash",sb.getHash());
+    	            postdatax1.put("previoushash",sb.getPreviousHash());
+    	        }
+    	        catch (JSONException e)
+    	        {
+    	            e.printStackTrace();
+    	        }
+    	        String requestJsonx1 = postdatax1.toString();
+    	        HttpEntity<String> entityx1 = new HttpEntity<String>(requestJsonx1,headersx1);
+    	        String answerx1 = restTemplatex1.postForObject(urlx1, entityx1, String.class);
+    	        System.out.println(answerx1);
+    			
+    		}
+        }
+        
+        //Sync End Here
+	
 		return mBlock;
 	}
 		
