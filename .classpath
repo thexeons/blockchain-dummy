@@ -11,6 +11,13 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
@@ -21,21 +28,8 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources">
-		<attributes>
-			<attribute name="test" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="lib/bcprov-jdk15on-159.jar"/>
-	<classpathentry kind="lib" path="lib/gson-2.6.2.jar"/>
-	<classpathentry kind="lib" path="lib/mysql-connector.jar"/>
-	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
-		<attributes>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="test" value="true"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/hazelnut/Documents/workspace-sts-3.9.5.RELEASE/Master/lib/bcprov-jdk15on-159.jar"/>
+	<classpathentry kind="lib" path="C:/Users/hazelnut/Documents/workspace-sts-3.9.5.RELEASE/Master/lib/gson-2.6.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/hazelnut/Documents/workspace-sts-3.9.5.RELEASE/Master/lib/mysql-connector.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

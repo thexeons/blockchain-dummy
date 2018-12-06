@@ -1,11 +1,10 @@
-package com.Profile.service;
+package com.bca.master.service;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
-import com.Profile.model.Block;
-import com.Profile.model.Person;
-import com.Profile.controller.MainController;
+import com.bca.master.model.Block;
+import com.bca.master.controller.MainController;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -19,6 +18,9 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Map;
+
+import org.springframework.stereotype.Service;
+
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
@@ -29,6 +31,7 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.util.Base64;
 
+@Service
 public class BlockService {
 	ResultSet rs;
 	ConnectDB db = new ConnectDB();

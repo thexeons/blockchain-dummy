@@ -1,4 +1,4 @@
-package com.Profile.controller;
+package com.bca.master.controller;
 
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -15,10 +15,12 @@ import java.util.concurrent.Callable;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,17 +32,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.Profile.model.Block;
-import com.Profile.model.SendBlock;
-import com.Profile.model.User;
-import com.Profile.model.Person;
-import com.Profile.service.BlockService;
-import com.Profile.service.ConnectDB;
-import com.Profile.service.PersonService;
+import com.bca.master.model.Block;
+import com.bca.master.model.SendBlock;
+import com.bca.master.model.User;
+import com.bca.master.service.BlockService;
+import com.bca.master.service.ConnectDB;
 
-@SpringBootApplication
+@Component
 @RestController
-@CrossOrigin(origins = "*")
 public class MainController {	
 	
 	ResultSet rs;
@@ -64,19 +63,11 @@ public class MainController {
 	public static int difficulty = 2;
 	
 	@Autowired
-	private PersonService mPersonService;
 	private BlockService mBlockService;
 	
-	public MainController(PersonService mPersonService) {
-		this.mPersonService = mPersonService;
+	public MainController(BlockService mBlockService) {
 		this.mBlockService = mBlockService;
 	}
-	
-
-//	@GetMapping("/persons")
-//	public java.util.List<Person> getAll() {
-//		return mPersonService.getAll();
-//	}
 	
 	@GetMapping("/blocks")
 	public java.util.List<Block> getAll() {
@@ -254,28 +245,6 @@ public class MainController {
 		}
 		
 	}
-	
-	
-	@GetMapping("/persons/{id}")
-	public Optional<Person> getPerson(@PathVariable("id") Long personId) {	
-		return mPersonService.getPerson(personId);
-	}
-	
-	@PostMapping("/personz")
-	public Person newPerson(@RequestBody Person mPerson) {
-		//throw IllegalArgumentException
-		Assert.hasLength(mPerson.getFirstName(), "First name field is needed");
-		Assert.hasLength(mPerson.getLastName(), "Last name field is needed");
-		
-		//throw MethodArgumentNotValidException
-		Assert.isTrue(mPerson.getFirstName().length()<20, "First name max 20 characters");
-		Assert.isTrue(mPerson.getLastName().length()<20, "Last name max 20 characters");
-		Assert.isTrue(mPerson.getAge()>0, "Minimum age is 0");
-		Person person = mPersonService.newPerson(mPerson);
-//		Assert.isTrue(person.getFirstName().equals("Maria"), "Test Mock Service");
-		return person;
-	}
-	
 	
 //	@PostMapping("/newBlock")
 //	public Block newBlock(@RequestBody Block mBlock) {
@@ -1380,26 +1349,6 @@ public class MainController {
         String answer = restTemplate.postForObject(url, entity, String.class);
         System.out.println(answer);		
         return mBlock;
-	}
-	
-	@DeleteMapping("/persons/{id}")
-	public void deletePerson(@PathVariable Long id) {
-		mPersonService.deletePerson(id);
-	}
-	
-	@PutMapping("/persons/{id}")
-	public Person replacePerson(@RequestBody Person newPerson, @PathVariable Long id) {
-		//throw IllegalArgumentException
-		Assert.hasLength(newPerson.getFirstName(), "First name field is needed");
-		Assert.hasLength(newPerson.getLastName(), "Last name field is needed");
-		
-		//throw MethodArgumentNotValidException
-		Assert.isTrue(newPerson.getFirstName().length()<20, "First name max 20 characters");
-		Assert.isTrue(newPerson.getLastName().length()<20, "Last name max 20 characters");
-		Assert.isTrue(newPerson.getAge()>0, "Minimum age is 0");		
-		
-		newPerson.setPersonId(id);
-		return mPersonService.replacePerson(newPerson, id);
 	}
 	
 	//View Block

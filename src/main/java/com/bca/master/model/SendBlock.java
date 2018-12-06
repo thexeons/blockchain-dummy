@@ -1,4 +1,4 @@
-package com.Profile.model;
+package com.bca.master.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
