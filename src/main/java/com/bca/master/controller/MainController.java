@@ -46,7 +46,7 @@ public class MainController {
 	ConnectDB db = new ConnectDB();
 	RestTemplate rt = new RestTemplate();
 	
-	public static final String[] master = {"192.168.43","192.168.43","192.168.43","192.168.43","192.168.43"};
+	public static final String[] master = {"192.168.43","192.168.43","192.168.43","192.168.43"};
 
 	public static final String  master1 = "192.168.43.219";
 	public static final String  master2 = "192.168.43.171";
