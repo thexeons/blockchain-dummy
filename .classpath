@@ -28,8 +28,8 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/hazelnut/Documents/workspace-sts-3.9.5.RELEASE/Master/lib/bcprov-jdk15on-159.jar"/>
-	<classpathentry kind="lib" path="C:/Users/hazelnut/Documents/workspace-sts-3.9.5.RELEASE/Master/lib/gson-2.6.2.jar"/>
-	<classpathentry kind="lib" path="C:/Users/hazelnut/Documents/workspace-sts-3.9.5.RELEASE/Master/lib/mysql-connector.jar"/>
+	<classpathentry kind="lib" path="lib/bcprov-jdk15on-159.jar"/>
+	<classpathentry kind="lib" path="lib/gson-2.6.2.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
