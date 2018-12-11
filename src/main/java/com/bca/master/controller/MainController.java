@@ -814,6 +814,7 @@ public class MainController {
 		String sendPhoto="";
 		String sendNationality="";
 		
+		
 		try {
 			db.openDB();
 			rs = db.executeQuery("select ktp from msuser where username ='"+xUser.getUsername()+"'");
@@ -995,6 +996,31 @@ public class MainController {
 		return uBlock;
 	}
 	
+	@PostMapping("/getUpdateStatus")
+	public String getUpdateStatus(@RequestBody Block uBlock) {
+		
+		int flag =1;
+		try {
+			db.openDB();
+			rs=db.executeQuery("select * from mstemp where verified like '2' and ktp like '"+uBlock.getKtp()+"'");
+			db.closeDB();
+			
+			if(rs.next()) {
+				//If rsnext == get something noupdate
+				flag = 0;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		if(flag ==0) {
+			return "0";
+		}
+		else{
+			return "1";
+		}
+		
+	}
 	
 	//send update block for verification
 	@PostMapping("/updateBlock")
@@ -1297,6 +1323,85 @@ public class MainController {
 		}
 		return "Done";
 	}
+	
+	//Get user detail by username -ferdy
+	//Get user detail about register , bl / pending
+		@PostMapping("/getUserDetailUsername")
+		public String getUserStatusUsername(@RequestBody User uUser) {
+			
+			String bankStatus ="not Registered";
+			String insuranceStatus ="not Registered";
+			String financialStatus ="not Registered";
+			String syariahStatus ="not Registered";
+			String sekuritasStatus ="not Registered";
+			System.out.println(uUser.getUsername());
+			
+			
+			
+			try {
+				db.openDB();
+				String ktpx = "";
+				rs = db.executeQuery("select ktp from msuser where username like '"+uUser.getUsername()+"'");
+				while(rs.next()) {
+					ktpx = rs.getString(1);
+				}
+				
+				rs=db.executeQuery("select bcabank,bcainsurance,bcasyariah,bcafinancial,bcasekuritas from mstemp where ktp ='"+ktpx+"'"); 
+				while(rs.next()) {
+					if(rs.getString(1).equals("1")) {bankStatus="Pending";}
+					if(rs.getString(2).equals("1")) {insuranceStatus="Pending";}
+					if(rs.getString(3).equals("1")) {syariahStatus="Pending";}
+					if(rs.getString(4).equals("1")) {financialStatus="Pending";}
+					if(rs.getString(5).equals("1")) {sekuritasStatus="Pending";}
+				}
+				
+				rs=db.executeQuery("select bcabank,bcainsurance,bcasyariah,bcafinancial,bcasekuritas from msdata where ktp='"+ktpx+"'");
+				while(rs.next()) {
+					if(rs.getString(1).equals("1")){bankStatus="Accepted";}
+					else if(rs.getString(1).equals("2")){bankStatus="Blacklist";}
+					
+					if(rs.getString(2).equals("1")) {insuranceStatus="Accepted";}
+					else if(rs.getString(2).equals("2")){insuranceStatus="Blacklist";}
+					
+					if(rs.getString(3).equals("1")) {syariahStatus="Accepted";}
+					else if(rs.getString(3).equals("2")){syariahStatus="Blacklist";}
+					
+					if(rs.getString(4).equals("1")) {financialStatus="Accepted";}
+					else if(rs.getString(4).equals("2")){financialStatus="Blacklist";}
+					
+					if(rs.getString(5).equals("1")) {sekuritasStatus="Accepted";}
+					else if(rs.getString(5).equals("2")){sekuritasStatus="Blacklist";}
+					
+					System.out.println("This is :"+rs.getString(1));
+					System.out.println(rs.getString(1)+" + "+rs.getString(2)+" + "+rs.getString(3)+" + "+rs.getString(4)+" + "+rs.getString(5));
+				}
+				
+				db.closeDB();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			System.out.println(bankStatus);
+			System.out.println(syariahStatus);
+			System.out.println(sekuritasStatus);
+			System.out.println(insuranceStatus);
+			System.out.println(financialStatus);
+			
+	        JSONObject postdata = new JSONObject();
+	        try {
+	            postdata.put("bankStatus",bankStatus);
+	            postdata.put("syariahStatus",syariahStatus);
+	            postdata.put("sekuritasStatus",sekuritasStatus);
+	            postdata.put("insuranceStatus",insuranceStatus);
+	            postdata.put("financeStatus",financialStatus);
+	        }
+	        catch (JSONException e){
+	            e.printStackTrace();
+	        }
+	        
+	        String requestJson = postdata.toString();
+			return requestJson;
+		}
 	
 	//Get user detail about register , bl / pending
 	@PostMapping("/getUserDetail")
