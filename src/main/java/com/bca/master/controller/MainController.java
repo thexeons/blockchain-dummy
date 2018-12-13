@@ -58,7 +58,7 @@ public class MainController {
 	public static final String  bcasyariahIP = "192.168.43.171";
 	public static final String  bcasekuritasIP = "192.168.43.219";
 	public static final String  bcafinancialIP = "192.168.43.219";
-	public static final String  bcainsuranceIP = "192.168.43.219";
+	public static final String  bcainsuranceIP = "192.168.43.171:8090";
 		
 	ArrayList<Block> alBlock = new ArrayList<Block>();
 	ArrayList<SendBlock> sendBlock = new ArrayList<SendBlock>();
@@ -75,6 +75,12 @@ public class MainController {
 	public java.util.List<Block> getAll() {
 		System.out.println("Controller: " + getBlock());
 		return getBlock();
+	}
+	
+	public void clrscr() {
+		for(int i = 0;i<26;i++) {
+			System.out.println("");
+		}
 	}
 	
 	public void validateBlock() {
@@ -998,25 +1004,30 @@ public class MainController {
 	
 	@PostMapping("/getUpdateStatus")
 	public String getUpdateStatus(@RequestBody Block uBlock) {
-		
+		clrscr();
+		System.out.println(uBlock.getKtp());
 		int flag =1;
 		try {
 			db.openDB();
 			rs=db.executeQuery("select * from mstemp where verified like '2' and ktp like '"+uBlock.getKtp()+"'");
-			db.closeDB();
+			
 			
 			if(rs.next()) {
 				//If rsnext == get something noupdate
+				System.out.println("gua ga salah!"+rs.getString(1));
 				flag = 0;
 			}
+			db.closeDB();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		if(flag ==0) {
+			System.out.println("haha");
 			return "0";
 		}
 		else{
+			System.out.println("haha");
 			return "1";
 		}
 		
