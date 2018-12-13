@@ -8,6 +8,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -182,10 +183,23 @@ public class MainController {
 	//Unit to master + notify
 	@PostMapping("/newUpdateBlock")
 	public Block newUpdateBlock(@RequestBody Block mBlock) {
+
+		//delete temp
+		String deleteKTP = mBlock.getKtp();
+		try {
+			db.openDB();
+			System.out.println(deleteKTP);
+			db.executeUpdate("delete from mstemp where ktp ='"+deleteKTP+"'");
+			System.out.println("Deleted from temp");
+			db.closeDB();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		String currId = "";
 		String prevHash ="";
 		String currHash ="";
 		String thisId="";
+		
 		
 		String notifBank ="0";
 		String notifFinancial ="0";
@@ -207,6 +221,8 @@ public class MainController {
 			}
 			alBlock.add(new Block(thisId,mBlock.getFirstname(),mBlock.getLastname(),mBlock.getKtp(),mBlock.getEmail(),mBlock.getDob(),mBlock.getAddress(),mBlock.getNationality(),mBlock.getAccountnum(),mBlock.getPhoto(),mBlock.getVerified(),currHash,mBlock.getBcabank(),mBlock.getBcainsurance(),mBlock.getBcasyariah(),mBlock.getBcafinancial(),mBlock.getBcasekuritas()));
 			mBlock.setHash(alBlock.get(alBlock.size()-1).mineBlock(difficulty)[0]);
+
+			mBlock.setTimeStamp(new Date().getTime());
 			mBlock.setNonce(Integer.parseInt(alBlock.get(alBlock.size()-1).mineBlock(difficulty)[1]));
 			Thread.sleep(100);
 			db.executeUpdate("insert into msdata(id,firstname,lastname,ktp,email,dob,address,nationality,accountnum,photo,verified,timestamp,nonce,bcabank,bcainsurance,bcasyariah,bcafinancial	,bcasekuritas) values "
@@ -379,14 +395,6 @@ public class MainController {
 	         System.out.println(answer);
 		}
 		
-		//delete temp
-		try {
-			db.openDB();
-			db.executeUpdate("delete from mstemp where ktp ='"+mBlock.getKtp()+"'");
-			db.closeDB();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	
 		
 		//Sync data to master 2 3 4 5
@@ -585,6 +593,7 @@ public class MainController {
 				alBlock.add(new Block("1",mBlock.getFirstname(),mBlock.getLastname(),mBlock.getKtp(),mBlock.getEmail(),mBlock.getDob(),mBlock.getAddress(),mBlock.getNationality(),mBlock.getAccountnum(),mBlock.getPhoto(),mBlock.getVerified(),"0",mBlock.getBcabank(),mBlock.getBcainsurance(),mBlock.getBcasyariah(),mBlock.getBcafinancial(),mBlock.getBcasekuritas()));
 				mBlock.setHash(alBlock.get(alBlock.size()-1).mineBlock(difficulty)[0]);
 				mBlock.setPreviousHash("0");
+				mBlock.setTimeStamp(new Date().getTime());
 				mBlock.setNonce(Integer.parseInt(alBlock.get(alBlock.size()-1).mineBlock(difficulty)[1]));
 				
 				Thread.sleep(100);
@@ -606,6 +615,8 @@ public class MainController {
 				}
 				alBlock.add(new Block(thisId,mBlock.getFirstname(),mBlock.getLastname(),mBlock.getKtp(),mBlock.getEmail(),mBlock.getDob(),mBlock.getAddress(),mBlock.getNationality(),mBlock.getAccountnum(),mBlock.getPhoto(),mBlock.getVerified(),currHash,mBlock.getBcabank(),mBlock.getBcainsurance(),mBlock.getBcasyariah(),mBlock.getBcafinancial(),mBlock.getBcasekuritas()));
 				mBlock.setHash(alBlock.get(alBlock.size()-1).mineBlock(difficulty)[0]);
+
+				mBlock.setTimeStamp(new Date().getTime());
 				mBlock.setNonce(Integer.parseInt(alBlock.get(alBlock.size()-1).mineBlock(difficulty)[1]));
 				Thread.sleep(100);
 				db.executeUpdate("insert into msdata(id,firstname,lastname,ktp,email,dob,address,nationality,accountnum,photo,verified,timestamp,nonce,bcabank,bcainsurance,bcasyariah,bcafinancial	,bcasekuritas) values "

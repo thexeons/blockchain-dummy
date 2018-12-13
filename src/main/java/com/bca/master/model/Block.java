@@ -127,7 +127,9 @@ public class Block {
 	
 	public String calculateHash(){
 		//String calculatedhash = StringUtil.applySha256(previousHash + Long.toString(timeStamp) + Integer.toString(nonce) + firstname+lastname+ktp+email+dob+address+nationality+accountnum);
-		String calculatedhash = StringUtil.applySha256(previousHash + Long.toString(timeStamp) + Integer.toString(nonce) + firstname+lastname+ktp+email+dob+address+nationality+accountnum);
+		String getString = previousHash + Long.toString(timeStamp) + Integer.toString(nonce) + firstname+lastname+ktp+email+dob+address+nationality+accountnum;
+		System.out.println(getString);
+		String calculatedhash = StringUtil.applySha256(getString);
 		
 		return calculatedhash;
 	}
