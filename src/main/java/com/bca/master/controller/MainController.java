@@ -1337,7 +1337,7 @@ public class MainController {
 	
 	//Get user detail by username -ferdy
 	//Get user detail about register , bl / pending
-		@PostMapping("/getUserDetailUsername")
+		@PostMapping("/getRegDetail2")
 		public String getUserStatusUsername(@RequestBody User uUser) {
 			
 			String bankStatus ="not Registered";
@@ -1415,7 +1415,7 @@ public class MainController {
 		}
 	
 	//Get user detail about register , bl / pending
-	@PostMapping("/getUserDetail")
+	@PostMapping("/getRegDetail")
 	public String getUserStatus(@RequestBody Block uBlock) {
 		
 		String bankStatus ="not Registered";
