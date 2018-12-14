@@ -5,6 +5,8 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 public class Block {
+	public static long timestampglobal=0;
+	
 	public String hash;
 	public String previousHash;
 	private String id;
@@ -130,7 +132,7 @@ public class Block {
 		String getString = previousHash + Long.toString(timeStamp) + Integer.toString(nonce) + firstname+lastname+ktp+email+dob+address+nationality+accountnum;
 		System.out.println(getString);
 		String calculatedhash = StringUtil.applySha256(getString);
-		
+		Block.timestampglobal = timeStamp;
 		return calculatedhash;
 	}
 	
