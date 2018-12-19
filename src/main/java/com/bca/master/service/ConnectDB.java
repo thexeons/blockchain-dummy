@@ -8,7 +8,7 @@ public class ConnectDB {
 	ResultSet rs;
 	
 	public void openDB() throws Exception{
-		Class.forName("com.mysql.jdbc.Driver");
+		Class.forName("com.mysql.cj.jdbc.Driver");
 		con=DriverManager.getConnection("jdbc:mysql://localhost:3306/skripsi","root","");
 		st=con.createStatement();
 	}
