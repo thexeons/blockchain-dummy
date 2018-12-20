@@ -29,7 +29,7 @@ public class MasterApplication {
 			rs = db.executeQuery("select * from msdata order by id desc limit 1");
 			if(!rs.next()) {
 				db.executeUpdate("insert into msdata(id,firstname,lastname,ktp,email,dob,address,nationality,accountnum,photo,verified,timestamp,nonce,bcabank,bcainsurance,bcasyariah,bcafinancial	,bcasekuritas) values "
-						+ "('1','Genesis','Genesis','Genesis','Genesis','Genesis','Genesis','Genesis','Genesis','Genesis','Genesis','1',78','Genesis','Genesis','Genesis','Genesis','Genesis')");                               
+						+ "('1','Genesis','Genesis','Genesis','Genesis','Genesis','Genesis','Genesis','Genesis','Genesis','Genesis','1','78','Genesis','Genesis','Genesis','Genesis','Genesis')");                               
 				
 				db.executeUpdate("insert into mshash(id,hash,previoushash) values('1','01a6af3d25bc58ec2472bf567701568c1ccea9beb70a3ce0779f88f42ffeba03','0')");
 

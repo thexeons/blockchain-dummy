@@ -47,13 +47,7 @@ public class MainController {
 	ConnectDB db = new ConnectDB();
 	RestTemplate rt = new RestTemplate();
 	
-	public static final String[] master = {"192.168.43.171:8095","192.168.43.217:8095","192.168.43","192.168.43"};
-
-	public static final String  master1 = "192.168.43.219";
-	public static final String  master2 = "192.168.43.171";
-	public static final String  master3 = "192.168.43.217";
-	public static final String  master4 = "192.168.43.100";
-	public static final String  master5 = "192.168.43.100";
+	public static final String[] master = {"192.168.43.171:8095","192.168.43.100:8095","192.168.43.219:8095","192.168.43"};
 	
 	public static final String  bcabankIP = "192.168.43.219:8090";
 	public static final String  bcasyariahIP = "192.168.43.100";
