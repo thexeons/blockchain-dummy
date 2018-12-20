@@ -47,18 +47,18 @@ public class MainController {
 	ConnectDB db = new ConnectDB();
 	RestTemplate rt = new RestTemplate();
 	
-	public static final String[] master = {"192.168.43","192.168.43","192.168.43","192.168.43"};
+	public static final String[] master = {"192.168.43.171:8095","192.168.43.217:8095","192.168.43","192.168.43"};
 
 	public static final String  master1 = "192.168.43.219";
 	public static final String  master2 = "192.168.43.171";
-	public static final String  master3 = "192.168.43.219";
-	public static final String  master4 = "192.168.43.219";
-	public static final String  master5 = "192.168.43.219";
+	public static final String  master3 = "192.168.43.217";
+	public static final String  master4 = "192.168.43.100";
+	public static final String  master5 = "192.168.43.100";
 	
-	public static final String  bcabankIP = "localhost:8090";
-	public static final String  bcasyariahIP = "192.168.43.171";
-	public static final String  bcasekuritasIP = "192.168.43.219";
-	public static final String  bcafinancialIP = "192.168.43.219";
+	public static final String  bcabankIP = "192.168.43.219:8090";
+	public static final String  bcasyariahIP = "192.168.43.100";
+	public static final String  bcasekuritasIP = "192.168.43.100";
+	public static final String  bcafinanceIP = "192.168.43.217:8090";
 	public static final String  bcainsuranceIP = "192.168.43.171:8090";
 		
 	ArrayList<Block> alBlock = new ArrayList<Block>();
@@ -338,7 +338,7 @@ public class MainController {
 		//Notify Financial
 		if(notifFinancial.equals("1")) {
 			RestTemplate restTemplate = new RestTemplate();
-	         String url = "http://"+bcafinancialIP+"/updateNotification";
+	         String url = "http://"+bcafinanceIP+"/updateNotification";
 	         HttpHeaders headers = new HttpHeaders();
 	         headers.setContentType(MediaType.APPLICATION_JSON);
 	         JSONObject postdata = new JSONObject();
@@ -949,7 +949,7 @@ public class MainController {
 		//delete from Financial
 		if(sendFinancial.equals("1")) {
 			RestTemplate restTemplate = new RestTemplate();
-	        String url = "http://"+bcafinancialIP+"/deleteUpdate";
+	        String url = "http://"+bcafinanceIP+"/deleteUpdate";
 	        HttpHeaders headers = new HttpHeaders();
 	        headers.setContentType(MediaType.APPLICATION_JSON);
 	        JSONObject postdata = new JSONObject();
@@ -1110,7 +1110,7 @@ public class MainController {
 		//Sending update to financial
 		if(uBlock.getBcafinancial().equals("1")) {
 			RestTemplate restTemplate = new RestTemplate();
-	         String url = "http://"+bcafinancialIP+"/getUpdate";
+	         String url = "http://"+bcafinanceIP+"/getUpdate";
 	         HttpHeaders headers = new HttpHeaders();
 	         headers.setContentType(MediaType.APPLICATION_JSON);
 	         JSONObject postdata = new JSONObject();
@@ -1623,7 +1623,7 @@ public class MainController {
 		//Sending to Financial
 		if(xBlock.getBcafinancial().equals("1")) {
 			RestTemplate restTemplate = new RestTemplate();
-	         String url = "http://"+bcafinancialIP+"/financialBlock";
+	         String url = "http://"+bcafinanceIP+"/financeBlock";
 	         HttpHeaders headers = new HttpHeaders();
 	         headers.setContentType(MediaType.APPLICATION_JSON);
 	         JSONObject postdata = new JSONObject();
