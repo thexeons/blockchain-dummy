@@ -24,21 +24,14 @@ public class MasterApplication {
 	public static long timestampglobal = 0;
 
 	public MasterApplication() {
-		ArrayList<Block> alBlock = new ArrayList<Block>();
-		Block mBlock = new Block("1", "Genesis", "Genesis", "Genesis", "Genesis", "Genesis", "Genesis", "Genesis", "Genesis", "Genesis", "Genesis", "0", "0", "Genesis", "Genesis", "Genesis", "Genesis", "Genesis", "null", "null");
 		try {
 			db.openDB();
 			rs = db.executeQuery("select * from msdata order by id desc limit 1");
 			if(!rs.next()) {
-				alBlock.add(new Block(mBlock.getId(),mBlock.getFirstname(),mBlock.getLastname(),mBlock.getKtp(),mBlock.getEmail(),mBlock.getDob(),mBlock.getAddress(),mBlock.getNationality(),mBlock.getAccountnum(),mBlock.getPhoto(),mBlock.getVerified(),"0",mBlock.getBcabank(),mBlock.getBcainsurance(),mBlock.getBcasyariah(),mBlock.getBcafinancial(),mBlock.getBcasekuritas()));
-				mBlock.setHash(alBlock.get(alBlock.size()-1).mineBlock(difficulty)[0]);
-				mBlock.setPreviousHash("0");
-				mBlock.setNonce(Integer.parseInt(alBlock.get(alBlock.size()-1).mineBlock(difficulty)[1]));
-				
 				db.executeUpdate("insert into msdata(id,firstname,lastname,ktp,email,dob,address,nationality,accountnum,photo,verified,timestamp,nonce,bcabank,bcainsurance,bcasyariah,bcafinancial	,bcasekuritas) values "
-						+ "('1','"+mBlock.getFirstname()+"','"+mBlock.getLastname()+"','"+mBlock.getKtp()+"','"+mBlock.getEmail()+"','"+mBlock.getDob()+"','"+mBlock.getAddress()+"','"+mBlock.getNationality()+"','"+mBlock.getAccountnum()+"','"+mBlock.getPhoto()+"','"+mBlock.getVerified()+"','"+Block.timestampglobal+"','"+mBlock.getNonce()+"','"+mBlock.getBcabank()+"','"+mBlock.getBcainsurance()+"','"+mBlock.getBcasyariah()+"','"+mBlock.getBcafinancial()+"','"+mBlock.getBcasekuritas()+"')");                               
+						+ "('1','Genesis','Genesis','Genesis','Genesis','Genesis','Genesis','Genesis','Genesis','Genesis','Genesis','1',78','Genesis','Genesis','Genesis','Genesis','Genesis')");                               
 				
-				db.executeUpdate("insert into mshash(id,hash,previoushash) values('1','"+mBlock.getHash()+"','"+mBlock.getPreviousHash()+"')");
+				db.executeUpdate("insert into mshash(id,hash,previoushash) values('1','01a6af3d25bc58ec2472bf567701568c1ccea9beb70a3ce0779f88f42ffeba03','0')");
 
 				System.out.println("Genesis Created");
 			}
