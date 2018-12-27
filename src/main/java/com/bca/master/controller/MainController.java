@@ -47,13 +47,15 @@ public class MainController {
 	ConnectDB db = new ConnectDB();
 	RestTemplate rt = new RestTemplate();
 	
-	public static final String[] master = {"192.168.43.171:8095","192.168.43.100:8095","192.168.43.219:8095","192.168.43"};
+	public static final String[] master = {"192.168.43.171:8095","192.168.43.217:8095","192.168.43.219:8095","192.168.43.222"};
 	
 	public static final String  bcabankIP = "192.168.43.219:8090";
-	public static final String  bcasyariahIP = "192.168.43.100";
-	public static final String  bcasekuritasIP = "192.168.43.100";
-	public static final String  bcafinanceIP = "192.168.43.217:8090";
 	public static final String  bcainsuranceIP = "192.168.43.171:8090";
+	public static final String  bcafinanceIP = "192.168.43.217:8090";
+	public static final String  bcasyariahIP = "192.168.43.222:8090";
+	public static final String  bcasekuritasIP = "192.168.43.219:8090";
+	
+	
 		
 	ArrayList<Block> alBlock = new ArrayList<Block>();
 	ArrayList<SendBlock> sendBlock = new ArrayList<SendBlock>();
