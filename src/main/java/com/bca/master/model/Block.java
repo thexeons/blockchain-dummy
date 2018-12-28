@@ -7,6 +7,18 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 public class Block {
 	public static long timestampglobal=0;
 	
+	public static String master1="0";
+	public static String master2="0";
+	public static String master3="0";
+	public static String master4="0";
+	
+
+	public static String bank="0";
+	public static String insurance="0";
+	public static String finance="0";
+	public static String syariah="0";
+	public static String sekuritas="0";
+	
 	public String hash;
 	public String previousHash;
 	private String id;

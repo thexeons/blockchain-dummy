@@ -43,6 +43,18 @@ public class MasterApplication {
 	
 	public static void main(String[] args) {
 		
+		Block.master1 = args[0];
+		Block.master2 = args[1];
+		Block.master3 = args[2];
+		Block.master4 = args[3];
+
+		Block.bank = args[4];
+		Block.insurance = args[5];
+		Block.finance = args[6];
+		Block.syariah = args[7];
+		Block.sekuritas = args[8];
+		
+		
 		new MasterApplication();
 		
 		SpringApplication.run(MasterApplication.class, args);

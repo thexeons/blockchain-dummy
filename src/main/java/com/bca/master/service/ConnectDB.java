@@ -9,7 +9,7 @@ public class ConnectDB {
 	
 	public void openDB() throws Exception{
 		Class.forName("com.mysql.cj.jdbc.Driver");
-		con=DriverManager.getConnection("jdbc:mysql://localhost:3306/skripsi","root","");
+		con=DriverManager.getConnection("jdbc:mysql://localhost:3306/skripsi?serverTimezone=Asia/Jakarta","root","");
 		st=con.createStatement();
 	}
 	
